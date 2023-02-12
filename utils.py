@@ -189,6 +189,13 @@ def find_note_subnote_number(number):
             subnote = ''
     return note,subnote
 
+def get_note_pattern(note,subnote):
+    if str(subnote).isnumeric():
+        note_pattern = str(note)+'.'+str(subnote)
+    else:
+        note_pattern = str(note)+str(subnote)
+    return note_pattern
+
 def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_dict):
     
     ###r"and|[\s,-]+" to split by (and comma space and hypen)
