@@ -9,8 +9,6 @@ from functools import reduce
 from typing import Optional
 
 
-
-
 def find_column_numbers(df):
     col_len = len(df.columns)
     return col_len
@@ -29,7 +27,7 @@ def get_note_column(df):
             break
     return note_row_num,note_col_num
 
-def get_years_and_positions(df,notes_indices):
+def get_years_and_positions_with_notes(df,notes_indices):
     def get_regex_year(val):
         year_val = -1
         regex = '(\d{4}|\d{2})'
@@ -52,7 +50,7 @@ def get_years_and_positions(df,notes_indices):
     year_indices: List(List) = []
     raw_year_text:list = []
     for idx,row in df.iterrows():
-        if (note_x-2) < idx < (note_x+2):
+        if (note_x-2) <= idx <= (note_x+2):
             for col_idx, item in row.iteritems():
                 if col_idx > note_y:
                     try:
@@ -69,7 +67,7 @@ def get_years_and_positions(df,notes_indices):
 
 
 def get_years_and_positions_without_notes(df):
-    ## this is withoug notes column
+    ## this is without notes column
     def get_regex_year(val):
         year_val = -1
         regex = '(\d{4}|\d{2})'
@@ -106,12 +104,13 @@ def get_years_and_positions_without_notes(df):
     return year_list,year_indices,raw_year_text
 
 
-def get_data_chunk_span(df,notes_indices,years_indices):
+def get_data_chunk_span_with_notes(df,notes_indices,years_indices):
+    # def get_max_from_nested_list(lista)
     notes_x = notes_indices[0]
     notes_y = notes_indices[1]
-    max_year_x = max(years_indices,key=max)[0]
-    min_year_y = min(years_indices,key=min)[1]
-    max_year_y = max(years_indices,key=max)[1]
+    max_year_x = list(np.max(np.array(years_indices),axis=0))[0]#max(years_indices,key=max)[0]
+    min_year_y = list(np.min(np.array(years_indices),axis=0))[1]#min(years_indices,key=min)[1]
+    max_year_y = list(np.max(np.array(years_indices),axis=0))[1]#max(years_indices,key=max)[1]
     max_header = max([notes_x,max_year_x])
     data_start_x = -1
     particulars_y = -1
@@ -125,11 +124,12 @@ def get_data_chunk_span(df,notes_indices,years_indices):
             data_end_y = max_year_y
             break
     return data_start_x,data_start_y,data_end_y,particulars_y
+    
 
 def get_data_chunk_span_without_notes(df,years_indices):
-    max_year_x = max(years_indices,key=max)[0]
-    min_year_y = min(years_indices,key=min)[1]
-    max_year_y = max(years_indices,key=max)[1]
+    max_year_x = list(np.max(np.array(years_indices),axis=0))[0]#max(years_indices,key=max)[0]
+    min_year_y = list(np.min(np.array(years_indices),axis=0))[1]#min(years_indices,key=min)[1]
+    max_year_y = list(np.max(np.array(years_indices),axis=0))[1]#max(years_indices,key=max)[1]
     max_header = max_year_x
     data_start_x = -1
     particulars_y = -1
@@ -199,8 +199,10 @@ def get_note_pattern(note,subnote):
 def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_dict):
     
     ###r"and|[\s,-]+" to split by (and comma space and hypen)
-    notes_col = df.iloc[notes_indices[0]+1:,notes_indices[1]]
-    particulars_col = df.iloc[notes_indices[0]+1:,particulars_y]
+    # notes_col = df.iloc[notes_indices[0]+1:,notes_indices[1]]
+    notes_col = df['Notes']
+    # particulars_col = df.iloc[notes_indices[0]+1:,particulars_y]
+    particulars_col = df['Particulars']
     ref_list : list = []
     for idx,val in enumerate(notes_col):
         notes_list = []
@@ -224,7 +226,8 @@ def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_di
                 subnote_no.extend([subnote])
             temp_dict = {}
             temp_dict['particular'] = particulars_col.iloc[idx]
-            temp_dict['raw_note_no'] = notes_list
+            temp_dict['raw_note_no'] = val
+            temp_dict['processed_raw_note'] = notes_list
             temp_dict['main_note_number']=note_no
             temp_dict['subnote_number'] = subnote_no
             ref_list.append(temp_dict)
@@ -234,4 +237,26 @@ def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_di
                     notes_dict[noteno][subnoteno].append(particulars_col.iloc[idx])
                 else:
                     notes_dict[noteno][subnoteno] = [particulars_col.iloc[idx]]
+    # print("ref list:", ref_list)
     return ref_list,notes_dict
+
+
+def number_data_processing(df,data_start_x,data_start_y,data_end_y):
+    def clean_number(number):
+        number = str(number).replace(r',',"")
+        number = str(number).replace(r')',"")
+        number = str(number).replace(r'(',"-")
+        return number
+    def split_merge_rows(row):
+        pass
+    for i in range(data_start_y,data_end_y+1):
+        df.iloc[data_start_x:,i] = df.iloc[data_start_x:,i].apply(clean_number).apply(pd.to_numeric , errors='coerce')
+#     for idx,row in df.iterrows()
+    return df
+
+
+def set_headers(df,data_start_x,data_end_y,headers):
+    subset_df = df.iloc[data_start_x:,:]
+    subset_df.columns = headers
+    subset_df = subset_df.reset_index(drop=True)
+    return subset_df

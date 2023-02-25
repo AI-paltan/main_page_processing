@@ -1,0 +1,24 @@
+key	keyword
+adjustments_begin	changes in operating assets and liabilities
+adjustments_begin	operating profit before working capital changes
+adjustments_begin	operating cash flow before working capital changes
+adjustments_begin	operating profit loss before working capital changes
+adjustments_begin	operating profit before changes in assets and liabilities
+adjustments_begin	adjustments for increase decrease in operating assets
+adjustments_begin	adjustments for increase decrease in operating liabilities
+adjustments_begin	adiustments for movements in working capital
+adjustments_begin	working capital adjustments
+adjustments_begin	changes in working capital
+adjustments_begin	movements in working capital
+adjustments_begin	changes in assets liabilities
+adjustments_end	tax paid
+adjustments_end	direct taxes paid
+adjustments_end	income tax paid net
+adjustments_end	donations paid
+adjustments_end	cash generated from operations
+adjustments_end	cash from operating activities
+adjustments_end	cash flows from operating activities
+adjustments_end	cash flow from used in operations
+adjustments_end	cash used in operating activities
+adjustments_end	cash generated from used in operations
+adjustments_end	cash generated used in operations
