@@ -210,12 +210,12 @@ def find_date_location(df):
     extracted_year_org = []
     first_col_date_flag,columns_number,row_numbers,raw_text,extracted_year = is_first_date_col(df)
     columns_number_org.extend(columns_number)
-    columns_number_org.extend(row_numbers)
+    row_numbers_org.extend(row_numbers)
     raw_text_org.extend(raw_text)
     extracted_year_org.extend(extracted_year)
     row_date_flag,regex_year_found,columns_number,row_numbers,raw_text,extracted_year = is_next_data_col(df,first_col_date_flag,row_numbers)
     columns_number_org.extend(columns_number)
-    columns_number_org.extend(row_numbers)
+    row_numbers_org.extend(row_numbers)
     raw_text_org.extend(raw_text)
     extracted_year_org.extend(extracted_year)
 
@@ -248,11 +248,11 @@ def find_data_block_location(note_df,date_block_coordinates):
         col,row = -1,-1
         particular_col,particular_row = -1,-1
         ## APEC International issue of PPE table where particular column 0 year value comes before data row
-        df = df.iloc[:,1:].copy()  ## issue solve test
-        for idx, value in df.iterrows():
-            row_found = df.iloc[idx].transform(pd.to_numeric,errors='coerce').notnull().any()
+        df_copy = df.iloc[:,1:].copy()  ## issue solve test
+        for idx, value in df_copy.iterrows():
+            row_found = df_copy.iloc[idx].transform(pd.to_numeric,errors='coerce').notnull().any()
             if row_found and idx not in year_rows:
-                data_present_column_indices_for_row = sorted(df.iloc[idx][df.iloc[idx].transform(pd.to_numeric,errors='coerce').notnull()].index.to_list())
+                data_present_column_indices_for_row = sorted(df_copy.iloc[idx][df_copy.iloc[idx].transform(pd.to_numeric,errors='coerce').notnull()].index.to_list())
                 if min(data_present_column_indices_for_row) > 0:
                     col = min(data_present_column_indices_for_row)
                     row = idx
@@ -260,7 +260,7 @@ def find_data_block_location(note_df,date_block_coordinates):
                         if col == min(year_cols):
                             particular_col=col-1
                         else:
-                            particular_col = min(year_cols)
+                            particular_col = min(year_cols)-1
                     else:
                         particular_col = 0                    
                 else:
