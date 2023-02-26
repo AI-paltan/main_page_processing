@@ -181,14 +181,16 @@ class mainPageProcess:
         self.notes_region_meta_data = self.notes_region_meta_data[self.notes_region_meta_data['start_page'].str.len()>0].reset_index(drop=True)
 
     def add_raw_note_to_notes_meta_data(self):
-        self.notes_region_meta_data['raw_note_number'] = None
+        self.notes_region_meta_data['raw_note_number'] = [[] for _ in range(len(self.notes_region_meta_data))]
         for statement,value in self.notes_ref_dict.items():
             for dct  in value:
                 note = dct.get('main_note_number')[0]
                 subnote = dct.get('subnote_number')[0] 
                 index_to_add_arr = self.notes_region_meta_data[(self.notes_region_meta_data['note']==str(note)) & (self.notes_region_meta_data['subnote']==str(subnote))].index.values
                 if len(index_to_add_arr)>0:
-                    self.notes_region_meta_data.at[index_to_add_arr[0],'raw_note_number'] = dct.get('raw_note_no')
+                    # self.notes_region_meta_data.at[index_to_add_arr[0],'raw_note_number'] = dct.get('raw_note_no')
+                    self.notes_region_meta_data.at[index_to_add_arr[0],'raw_note_number'].append(dct.get('raw_note_no'))
+
 
     def standardize_notes_data(self):
         obj_noteStandardise = NoteStandardised(self.cropped_table_dict)
