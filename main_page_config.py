@@ -20,6 +20,10 @@ class Main_Page_CoreSettings(BaseSettings):
     ccf_refactor_sections:str=os.path.join(path.dirname(__file__),'keywords_library/ccf_refactor_sections.tsv')
     ccf_refactor_subsections:str=os.path.join(path.dirname(__file__),'keywords_library/ccf_refactor_subsections.tsv')
 
+class Keyword_mapping_Settings(BaseSettings):
+    ccf_section_subtotal_keywords :str = os.path.join(path.dirname(__file__),'keywords_library/ccf_section_subtotal_keywords.tsv')
+
 
 settings = Settings()
 main_page_core_settings = Main_Page_CoreSettings()
+keyword_mapping_settings = Keyword_mapping_Settings()

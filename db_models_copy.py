@@ -154,3 +154,4 @@ class CRM_nlp_bucketing(Base):
     sequence_view = Column(String)
     match_type = Column(String)
     cdm_keyword_name = Column(String)
+

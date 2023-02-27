@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID,ARRAY
 
-from database import Base
+from .database import Base
 
 
 class FileLogs(Base):
@@ -154,3 +154,4 @@ class CRM_nlp_bucketing(Base):
     sequence_view = Column(String)
     match_type = Column(String)
     cdm_keyword_name = Column(String)
+

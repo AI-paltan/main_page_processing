@@ -18,7 +18,7 @@ def find_note_start_index(note_pattern,account_text,ocr_line_df_dict,max_main_pa
         if k > max_main_page : ## alaways start after cash flow page
             for idx,row in df.iterrows():
                 if note_end_testing(note_pattern,row['text'].lower()):
-                    ratio = fuzz.partial_ratio(account_text.lower(), row['text'].lower())
+                    ratio = fuzz.partial_ratio(str(account_text).lower(), row['text'].lower())
                     if ratio > 85:
                         page_number.append(k)
                         start_bbox.append([row['left'],row['top'],row['right'],row['down']])
