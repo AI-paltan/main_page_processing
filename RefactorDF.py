@@ -10,12 +10,18 @@ class RefactorCBS:
     
     def start_refactoring(self):
         col_num = self.find_template()
+        standard_df = pd.DataFrame()
         if col_num == 4 :
             standard_df, temp_df = self.ideal_format_processing()
         if col_num == 3:
             standard_df, temp_df = self.non_ideal_format_without_notes_processing()
         if col_num == 6:
             standard_df, temp_df = self.non_ideal_format_processing()
+        if col_num == 5:
+            self.df = check_and_remove_duplicate_column(self.df)
+            col_num = self.find_template()
+            if col_num == 4:
+                standard_df, temp_df = self.ideal_format_processing()
         return standard_df, temp_df
 
         

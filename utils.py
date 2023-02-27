@@ -7,7 +7,7 @@ from typing import List
 from datetime import date
 from functools import reduce
 from typing import Optional
-
+from fuzzywuzzy import fuzz
 
 def find_column_numbers(df):
     col_len = len(df.columns)
@@ -260,3 +260,19 @@ def set_headers(df,data_start_x,data_end_y,headers):
     subset_df.columns = headers
     subset_df = subset_df.reset_index(drop=True)
     return subset_df
+
+def check_and_remove_duplicate_column(nte_df):
+    cnt = 0
+    row_duplicate = 0
+    ratio_duplicate = 0
+    # if particular_end_col > 0 and particular_end_col==1:
+    for idx,row in nte_df.iterrows():
+        if not pd.isnull(row[1]):
+            if (fuzz.partial_ratio(str(row[1]),str(row[0])) > 95):
+                row_duplicate = row_duplicate+1
+            cnt=cnt+1
+    if row_duplicate > 0:
+        ratio_duplicate = (row_duplicate/cnt)*100
+        if ratio_duplicate > 90:
+            nte_df = nte_df.drop(nte_df.columns[1], axis=1).T.reset_index(drop=True).T
+    return nte_df
