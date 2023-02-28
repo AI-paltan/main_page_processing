@@ -427,6 +427,7 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
         col_subscript = -1
         row_indices = []
         fin_df['year'] = None
+        year_column_header_name = None
         header_indices = sorted(header_indices,reverse=True)
         for column,rows in zip(date_coordinates[0],date_coordinates[1]):
                 if column > 0:
@@ -438,11 +439,13 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
             # print(fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime,unit='ns'))
             try:
                 fin_df['year'] = fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime).dt.year
+                year_column_header_name = f"header_col_{col_subscript}"
             except:
                 for idx,row in fin_df.iterrows():
                     year = get_regex_year(str(row[f"header_col_{col_subscript}"]))
                     if int(year)>0:
                         fin_df.at[idx,'year'] = year
+                        year_column_header_name = f"header_col_{col_subscript}"
         else:
             row_header_flag = False
             if 'row_header' in fin_df.columns:
@@ -474,7 +477,7 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
                         if cnt >=2:
                             break    
 
-        return fin_df
+        return fin_df,year_column_header_name
     
 
 # def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):

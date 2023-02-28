@@ -47,6 +47,7 @@ class mainPageProcess:
         self.notes_region_meta_data = pd.DataFrame()
         self.cropped_table_dict : Dict = {}
         self.standardised_cropped_dict : Dict = {}
+        self.standard_note_meta_dict = {}
 
     def process_main_pages(self,fileid:str):
         self.fileid=fileid
@@ -196,6 +197,6 @@ class mainPageProcess:
         obj_noteStandardise = NoteStandardised(self.cropped_table_dict)
         obj_noteStandardise.trigger_job()
         self.standardised_cropped_dict = obj_noteStandardise.standard_note_df
-
+        self.standard_note_meta_dict = obj_noteStandardise.standard_note_meta_dict
     def save_logs_in_db(self):
         pass
