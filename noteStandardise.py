@@ -8,6 +8,7 @@ class NoteStandardised:
         self.cropped_table_dict = cropped_table_dict
         self.standard_note_df : Dict = {}
         self.standard_note_meta_dict = {}
+        self.transformed_standardised_cropped_dict = {}
         # self.final_df = pd.DataFrame
         # self.main_sheet_num_cols = main_sheet_num_cols
 
@@ -31,6 +32,7 @@ class NoteStandardised:
             if len(note_df)>0:
                 final_df = pd.DataFrame()
                 meta_dict : Dict = {}
+                final_transformed_df = pd.DataFrame()
                 try:
                     note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
                     columns_number,row_number,raw_text,extracted_year = find_date_location(note_df)
@@ -43,6 +45,7 @@ class NoteStandardised:
                     row_header_to_columns_df = convert_row_header_to_columns(fill_missing_multilevel_header_df,row_header_indices,particular_start_row)
                     fin_df = convert_col_header_to_columns(row_header_to_columns_df,header_indices,particular_end_col,particular_start_row,databox_end_coordinates)
                     final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
+                    final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
                     meta_dict["date_column_number"] = columns_number
                     meta_dict["date_row_number"] = row_number
                     meta_dict["date_raw_text"] = raw_text
@@ -64,6 +67,7 @@ class NoteStandardised:
                     print(e)
                 self.standard_note_df[key] = final_df
                 self.standard_note_meta_dict[key] = meta_dict
+                self.transformed_standardised_cropped_dict[key] = final_transformed_df
 
 
     def non_ideal_template_processing(self):

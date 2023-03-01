@@ -515,3 +515,29 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
 #                         break
 
 #         return fin_df
+
+def convert_standaradised_notes_to_column_row_year(note_df,year_column_header_name_in):
+    ## this function converts standradised note df into 4 columns. rows will be combination of row header + line item 1 + line item 0
+    ## cols will be combination of col_header_1 + col_header_0 etc. column which contains year value will be dropped based on standard_note_meta_dict_item
+    converted_standardised_df = pd.DataFrame(columns=["rows","columns","year","value"])
+    note_df["year"] = note_df["year"].fillna(note_df["year"].max())
+    # for curr_year in year_list:
+    #         converted_standardised_df[str(curr_year)] = float(0)
+
+    year_column_header_name = year_column_header_name_in
+    if year_column_header_name:
+         note_df = note_df.drop(year_column_header_name,axis=1)
+    line_item_colnames = note_df.filter(like="line_item", axis=1).columns.to_list()
+    col_header_colnames = note_df.filter(like="header_col", axis=1).sort_index(axis=1, ascending=False).columns.to_list()
+    row_header_available = False
+    if "row_header" in note_df.columns.to_list():
+         row_header_available = True
+         row_colmns = ["row_header"]
+         row_colmns.extend(line_item_colnames)
+         converted_standardised_df["rows"] = note_df[row_colmns].fillna('').apply(" ".join, axis=1)
+    else:
+         converted_standardised_df["rows"] = note_df[line_item_colnames].fillna('').apply(" ".join, axis=1)
+    converted_standardised_df["columns"] = note_df[col_header_colnames].fillna('').apply(" ".join, axis=1)
+    converted_standardised_df["year"] = note_df["year"]
+    converted_standardised_df["value"] = note_df["value"]
+    return converted_standardised_df

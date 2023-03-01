@@ -48,6 +48,7 @@ class mainPageProcess:
         self.cropped_table_dict : Dict = {}
         self.standardised_cropped_dict : Dict = {}
         self.standard_note_meta_dict = {}
+        self.transformed_standardised_cropped_dict : Dict = {}
 
     def process_main_pages(self,fileid:str):
         self.fileid=fileid
@@ -58,6 +59,7 @@ class mainPageProcess:
         # self.find_note_page_area()
         self.get_note_data_tables()
         self.standardize_notes_data()
+        # self.transform_standardised_notes_data()
         self.save_logs_in_db()
         return self.cbs_df_dict,self.cpl_df_dict,self.ccf_df_dict,self.meta_dict,self.final_notes_dict,self.notes_ref_dict, self.notes_region_meta_data, self.cropped_table_dict
 
@@ -198,5 +200,9 @@ class mainPageProcess:
         obj_noteStandardise.trigger_job()
         self.standardised_cropped_dict = obj_noteStandardise.standard_note_df
         self.standard_note_meta_dict = obj_noteStandardise.standard_note_meta_dict
+        self.transformed_standardised_cropped_dict = obj_noteStandardise.transformed_standardised_cropped_dict
+    # def transform_standardised_notes_data():
+
+
     def save_logs_in_db(self):
         pass
