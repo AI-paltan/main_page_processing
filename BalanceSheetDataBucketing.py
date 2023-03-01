@@ -10,12 +10,14 @@ from DataBucketingUtils import *
 
 
 class BalanceSheetDataBucketing():
-    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data):
+    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict):
         self.df_datasheet = df_datasheet
         self.df_nlp_bucket_master = df_nlp_bucket_master
         self.df_datasheet_cp = df_datasheet.copy()
         self.notes_ref_dict = notes_ref_dict
         self.notes_region_meta_data = notes_region_meta_data    
+        self.standardised_cropped_dict = standardised_cropped_dict
+        self.standard_note_meta_dict = standard_note_meta_dict
 
         self.ps = PorterStemmer()
         self.conf_score_thresh = 80
@@ -85,9 +87,12 @@ class BalanceSheetDataBucketing():
         filter_headers = ['Notes', 'Particulars', 'statement_section', 'statement_sub_section']
 
         # get years list
-        self.years_list = [i for i in data_column_names if i not in filter_headers]
+        years_list = ([int(i) for i in data_column_names if i not in filter_headers])
+        years_list.sort()
+        self.years_list = [str(i) for i in years_list]
 
 
+  
 
     def get_CASH_AND_CASH_EQUIVALENTS():
         pass

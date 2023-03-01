@@ -22,7 +22,7 @@ def strip_string_bullets(str_txt,obj_techfuzzy):
         strip_string_bullets_str = re.sub(r'\s\s+', " ", strip_string_bullets_str)
         return strip_string_bullets_str
 
-def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,match_type):
+def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,conf_score_thresh,match_type='partial'):
     best_match = {'data_index': [], 'score': 0, 'value': 0, 'label': [],'note_numbers':[]}
     for data_index, data_row in df_datasheet.iterrows():
             # skip if data value is already found for bucketing
@@ -38,7 +38,7 @@ def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,match
                 res_fuzz_match = obj_techfuzzy.token_sort_pro(txt_particular, list_target_keywords)
             # app.logger.debug(f'\t\t{res_fuzz_match}')
 
-            if res_fuzz_match[0][1] >= self.conf_score_thresh:
+            if res_fuzz_match[0][1] >= conf_score_thresh:
                 # if bucket_row['field_tag'] == 'multisum':
                 best_match['value'] += float(data_row[curr_year])
                 best_match['score'] = res_fuzz_match[0][1]
@@ -49,6 +49,8 @@ def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,match
                 (best_match['label']).append(data_row[str("Particulars")])
 
     return best_match
+
+
 
 
 def get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match,notes_reference_dict,notes_region_meta_data,standardised_cropped_dict,statement_type):
@@ -69,8 +71,31 @@ def get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_m
     return filtered_standardised_tables_dict
 
 
-def clean_standardised_notes_tables(note_df):
-     pass
+def convert_standaradised_notes_to_column_row_year(note_df,year_list,standard_note_meta_dict_item):
+    ## this function converts standradised note df into 4 columns. rows will be combination of row header + line item 1 + line item 0
+    ## cols will be combination of col_header_1 + col_header_0 etc. column which contains year value will be dropped based on standard_note_meta_dict_item
+    converted_standardised_df = pd.DataFrame(columns=["rows","columns","year","value"])
+    note_df["year"] = note_df["year"].fillna(note_df["year"].max())
+    # for curr_year in year_list:
+    #         converted_standardised_df[str(curr_year)] = float(0)
+
+    year_column_header_name = standard_note_meta_dict_item.get('year_column_header_name')
+    if year_column_header_name:
+         note_df = note_df.drop(year_column_header_name,axis=1)
+    line_item_colnames = note_df.filter(like="line_item", axis=1).columns.to_list()
+    col_header_colnames = note_df.filter(like="header_col", axis=1).sort_index(axis=1, ascending=False).columns.to_list()
+    row_header_available = False
+    if "row_header" in note_df.columns.to_list():
+         row_header_available = True
+         row_colmns = ["row_header"].extend(line_item_colnames)
+         converted_standardised_df["row"] = note_df[row_colmns].apply(" ".join, axis=1)
+    else:
+         converted_standardised_df["row"] = note_df[line_item_colnames].apply(" ".join, axis=1)
+    converted_standardised_df["columns"] = note_df[col_header_colnames].apply(" ".join, axis=1)
+    converted_standardised_df["year"] = note_df["year"]
+    converted_standardised_df["value"] = note_df["value"]
+    
+    # converted_standardised_df["rows"] = 
 
 def get_notes_pages_line_items(df_notes,keywords):
     pass
