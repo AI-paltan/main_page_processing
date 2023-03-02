@@ -44,6 +44,8 @@ class NoteStandardised:
                     fill_missing_multilevel_header_df = fill_missing_multilevel_header(nte_df,header_indices,particular_end_col)
                     row_header_to_columns_df = convert_row_header_to_columns(fill_missing_multilevel_header_df,row_header_indices,particular_start_row)
                     fin_df = convert_col_header_to_columns(row_header_to_columns_df,header_indices,particular_end_col,particular_start_row,databox_end_coordinates)
+                    # print(fin_df)
+                    # print(key)
                     final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
                     final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
                     meta_dict["date_column_number"] = columns_number

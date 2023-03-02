@@ -427,7 +427,7 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
         col_subscript = -1
         row_indices = []
         fin_df['year'] = None
-        year_column_header_name = None
+        year_column_header_name = ' '
         header_indices = sorted(header_indices,reverse=True)
         for column,rows in zip(date_coordinates[0],date_coordinates[1]):
                 if column > 0:
@@ -476,7 +476,6 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
                                 cnt =cnt+1
                         if cnt >=2:
                             break    
-
         return fin_df,year_column_header_name
     
 
@@ -520,12 +519,13 @@ def convert_standaradised_notes_to_column_row_year(note_df,year_column_header_na
     ## this function converts standradised note df into 4 columns. rows will be combination of row header + line item 1 + line item 0
     ## cols will be combination of col_header_1 + col_header_0 etc. column which contains year value will be dropped based on standard_note_meta_dict_item
     converted_standardised_df = pd.DataFrame(columns=["rows","columns","year","value"])
+    note_df["year"] = pd.to_numeric(note_df["year"],errors='coerce')
     note_df["year"] = note_df["year"].fillna(note_df["year"].max())
     # for curr_year in year_list:
     #         converted_standardised_df[str(curr_year)] = float(0)
 
     year_column_header_name = year_column_header_name_in
-    if year_column_header_name:
+    if year_column_header_name and len(year_column_header_name) >=5:
          note_df = note_df.drop(year_column_header_name,axis=1)
     line_item_colnames = note_df.filter(like="line_item", axis=1).columns.to_list()
     col_header_colnames = note_df.filter(like="header_col", axis=1).sort_index(axis=1, ascending=False).columns.to_list()
