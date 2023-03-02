@@ -105,19 +105,21 @@ class BalanceSheetDataBucketing():
         main_page_year_total_lst = []
         main_page_raw_note_list = []
         for year in self.years_list:
+            print(year)
             main_page_best_match= get_main_page_line_items(df_datasheet=self.df_datasheet,keywords=main_page_targat_keywords,curr_year=year,obj_techfuzzy=self.obj_techfuzzy,conf_score_thresh=self.conf_score_thresh)
             print(f"main_page_best_match:= {main_page_best_match}")
-            # print(list(main_page_best_match.get("label")))
-            filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list = get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match=main_page_best_match,notes_reference_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,trasnformed_standardised_cropped_dict=self.transformed_standardised_cropped_dict,statement_type="cbs")
-            print(f"1.raw_note_list: {raw_note_list},note_number_list: {note_number_list},sbnoue: {subnote_number_list},tableid:{tableid_list}")
-            temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
-            notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
-            main_page_data_indices.append(main_page_best_match.get("data_index"))
+            # main_page_data_indices.append(main_page_best_match.get("data_index"))
+            main_page_data_indices = main_page_best_match.get("data_index")
             main_page_year_total_lst.append(main_page_best_match.get("value"))
-            main_page_raw_note_list.append(raw_note_list)
+            # print(list(main_page_best_match.get("label")))
+        filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list = get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match=main_page_best_match,notes_reference_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,trasnformed_standardised_cropped_dict=self.transformed_standardised_cropped_dict,statement_type="cbs")
+        print(f"1.raw_note_list: {raw_note_list},note_number_list: {note_number_list},sbnoue: {subnote_number_list},tableid:{tableid_list}")
+        temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
+        notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
+        main_page_raw_note_list = raw_note_list
             # get_notes_pages_line_items()
         temp_dict ={}
-        temp_dict["main_page_row_indices"] =main_page_data_indices
+        temp_dict["main_page_row_indices"] = main_page_data_indices
         temp_dict["main_page_year_total"] =main_page_year_total_lst
         temp_dict["main_page_raw_note"] =main_page_raw_note_list
         temp_dict["notes_table_df"] = notes_table_df
