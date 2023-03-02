@@ -61,43 +61,59 @@ def get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_m
     raw_note_list = []
     note_number_list= []
     subnote_number_list =[]
-    tableid_list = []
+    tableid_list_main = []
+    prcoessed_tabelids = []
+    # print(notes_region_meta_data)
     for account,note_nums in zip(main_page_best_match.get('label'),main_page_best_match.get('note_numbers')):
-        # print(f"account: {account} and note= {note_nums} and len = {len(note_nums)}")
+        # print(f"account: {account} and note= {note_nums}")
         # if len(note_nums) >= 1:
         reference_notes_dict = notes_reference_dict.get(statement_type)
         # print(f"reference_notes_dict = {reference_notes_dict}")
         # for account in account_list:
             # print(f"account = {account}")
+        
         for refe_notes in reference_notes_dict:
             # print(f"refe_notes = {refe_notes}")
             if str(account) == str(refe_notes.get('particular')):
                 # print("yes matched")
+                
                 for note,subnote in zip(refe_notes.get('main_note_number'),refe_notes.get('subnote_number')):
-                # note = refe_notes.get('main_note_number')
-                # subnote = refe_notes.get('subnote_number')
-                    tableid_list = notes_region_meta_data[(notes_region_meta_data['note']==str(note)) & (notes_region_meta_data['subnote']==str(subnote))]['tableid'].values[0]
-                    # for idx,tableid_row in tableid_list.iterrows():
-                    # print(tableid_list)
-                    # print(len(tableid_list))
-                    if len(tableid_list)>=1:
-                        for i in range(len(tableid_list)):
-                            # print(f"i{i}")
-                            tableid = tableid_list[i]
-                            # print(f"tableid={tableid}")
-                            combo_key = str(note)+"_"+str(subnote)+"_"+str(tableid)
-                            # print(f"combo key = {combo_key}")
-                            # filtered_standardised_tables_dict[tableid] = standardised_cropped_dict.get(tableid)
-                            # filtered_transformed_standardised_tables_dict[tableid] = trasnformed_standardised_cropped_dict.get(tableid)
-                            filtered_standardised_tables_dict[combo_key] = standardised_cropped_dict.get(combo_key)
-                            # print(filtered_standardised_tables_dict[combo_key])
-                            filtered_transformed_standardised_tables_dict[combo_key] = trasnformed_standardised_cropped_dict.get(combo_key)
-                            # print(filtered_transformed_standardised_tables_dict[combo_key])
-                            raw_note_list.append(refe_notes.get('raw_note_no'))
-                            note_number_list.append(note)
-                            subnote_number_list.append(subnote)
-                            tableid_list.append(tableid)
-    return filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list
+                    # note = refe_notes.get('main_note_number')
+                    # subnote = refe_notes.get('subnote_number')
+                    # print(notes_region_meta_data[(notes_region_meta_data['note']==str(note)) & (notes_region_meta_data['subnote']==str(subnote))]['tableid'].values)
+                    lst = notes_region_meta_data[(notes_region_meta_data['note']==str(note)) & (notes_region_meta_data['subnote']==str(subnote))]['tableid'].values
+                    if len(lst)>0:
+                    # tableid_list = notes_region_meta_data[(notes_region_meta_data['note']==str(note)) & (notes_region_meta_data['subnote']==str(subnote))]['tableid'].values[0]
+                        tableid_list = list(set(lst[0]))
+                        # for idx,tableid_row in tableid_list.iterrows():
+                        # print(f"note : {note} nad subnote: {subnote}")
+                        # print(f"tableid list : {tableid_list}")
+                        # print(len(tableid_list))
+                        if len(tableid_list)>=1:
+                            for i in range(len(tableid_list)):
+                                # print(f"i{i}")
+                                
+                                tableid = tableid_list[i]
+                                if tableid not in prcoessed_tabelids:
+                                    # print(f"note : {note} nad subnote: {subnote}")
+                                    # print(f"tableid list : {tableid_list}")
+                                    # print(f"tableid={tableid}")
+                                    combo_key = str(note)+"_"+str(subnote)+"_"+str(tableid)
+                                    # print(f"combo key = {combo_key}")
+                                    # filtered_standardised_tables_dict[tableid] = standardised_cropped_dict.get(tableid)
+                                    # filtered_transformed_standardised_tables_dict[tableid] = trasnformed_standardised_cropped_dict.get(tableid)
+                                    filtered_standardised_tables_dict[combo_key] = standardised_cropped_dict.get(combo_key)
+                                    # print(filtered_standardised_tables_dict[combo_key])
+                                    filtered_transformed_standardised_tables_dict[combo_key] = trasnformed_standardised_cropped_dict.get(combo_key)
+                                    # print(filtered_transformed_standardised_tables_dict[combo_key])
+                                    raw_note_list.append(refe_notes.get('raw_note_no'))
+                                    note_number_list.append(note)
+                                    subnote_number_list.append(subnote)
+                                    tableid_list_main.append(tableid)
+                                    prcoessed_tabelids.append(tableid)
+                        
+
+    return filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list_main
 
 
 # def convert_standaradised_notes_to_column_row_year(note_df,year_list,standard_note_meta_dict_item):
@@ -151,7 +167,7 @@ def get_notes_pages_line_items(transformed_standardised_note_df,standardised_not
                     (best_match['score']).append(res_fuzz_match[0][1])
                     (best_match['data_index']).append(data_index)
                     # if len(data_row['Notes']) > 1:
-                    (best_match['note_numbers']).append(data_row['Notes'])
+                    # (best_match['note_numbers']).append(data_row['Notes'])
                     # self.cbs_drilldown_items(bucket_row, data_row)
                     (best_match['label']).append(data_row[str("Particulars")])
                     (best_match['colname_found']).append(col)
@@ -168,12 +184,14 @@ def prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,ta
     temp_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
     for raw_note,note,subnote,tableid in zip(raw_note_list,note_number_list,subnote_number_list,tableid_list):
         std_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
+        combo_key = str(note)+"_"+str(subnote)+"_"+str(tableid)
         for key,value in filtered_transformed_standardised_tables_dict.items():
             # _df = filtered_transformed_standardised_tables_dict.get(tableid)
-            _df = value
-            std_df["line_item"] =  _df[["columns","rows"]].fillna('').apply(" ".join, axis=1)
-            std_df["year"] = _df["year"]
-            std_df["value"] = _df["value"]
+            if key == combo_key:
+                _df = value
+                std_df["line_item"] =  _df[["columns","rows"]].fillna('').apply(" ".join, axis=1)
+                std_df["year"] = _df["year"]
+                std_df["value"] = _df["value"]
         std_df["raw_note_no"]=raw_note
         std_df["note_no"]=note
         std_df["subnote_no"]=subnote

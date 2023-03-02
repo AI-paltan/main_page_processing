@@ -250,7 +250,7 @@ def number_data_processing(df,data_start_x,data_start_y,data_end_y):
     def split_merge_rows(row):
         pass
     for i in range(data_start_y,data_end_y+1):
-        df.iloc[data_start_x:,i] = df.iloc[data_start_x:,i].apply(clean_number).apply(pd.to_numeric , errors='coerce')
+        df.iloc[data_start_x:,i] = df.iloc[data_start_x:,i].apply(clean_number).apply(pd.to_numeric , errors='coerce').fillna(0)
 #     for idx,row in df.iterrows()
     return df
 

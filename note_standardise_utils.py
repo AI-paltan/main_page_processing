@@ -541,3 +541,15 @@ def convert_standaradised_notes_to_column_row_year(note_df,year_column_header_na
     converted_standardised_df["year"] = note_df["year"]
     converted_standardised_df["value"] = note_df["value"]
     return converted_standardised_df
+
+
+def numbers_processing(df):
+    def clean_number(number):
+        number = str(number).replace(r',',"")
+        number = str(number).replace(r')',"")
+        number = str(number).replace(r'(',"-")
+        return number
+
+    df["value"] = df["value"].apply(clean_number).apply(pd.to_numeric , errors='coerce').fillna(0)
+#     for idx,row in df.iterrows()
+    return df

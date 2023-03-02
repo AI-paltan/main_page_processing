@@ -19,9 +19,9 @@ class CBSMapping:
 
     def trigger_job(self):
         self.get_nlp_bucket_df_from_db()
-        self.calculate_CCF()
+        self.calculate_CBS()
 
-    def calculate_CCF(self):
+    def calculate_CBS(self):
         obj_cbs_bucketing = BalanceSheetDataBucketing(df_datasheet=self.datasheet,df_nlp_bucket_master=self.df_nlp_bucket_master,notes_ref_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,standard_note_meta_dict=self.standard_note_meta_dict,transformed_standardised_cropped_dict= self.transformed_standardised_cropped_dict)
         obj_cbs_bucketing.fetch_report()
         self.bs_bucket_dict = obj_cbs_bucketing.bs_bucketing_dict

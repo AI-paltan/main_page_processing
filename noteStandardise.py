@@ -47,6 +47,7 @@ class NoteStandardised:
                     # print(fin_df)
                     # print(key)
                     final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
+                    final_df = numbers_processing(final_df)
                     final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
                     meta_dict["date_column_number"] = columns_number
                     meta_dict["date_row_number"] = row_number
