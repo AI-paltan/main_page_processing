@@ -63,17 +63,23 @@ def find_next_note_subnote(note,subnote=''):
 
 
 def x_cord_filter(bbox):
-    if int(bbox[0]) < 150:
+    if int(bbox[0]) < 200: ## issue ovserved with TIC so increase x limit
         return True
     else:
         return False
     
-def get_first_note_occurance(notes_pages,notes_bbox):
+def get_first_note_occurance(notes_pages,notes_bbox,max_main_page):   ## issue TIC: picking index page after ccf for majorit of notes. need filtering
     final_page = []
     final_bbox = []
-    tmp_pge = notes_pages[0]
-    tmpbbox = notes_bbox[0]
-    for pge,bbox in zip(notes_pages,notes_bbox):
+    notes_pages_int = []
+    notes_bbox_int = []
+    for pge,bbx in zip(notes_pages,notes_bbox):
+        if pge > max_main_page + 4:
+            notes_pages_int.append(pge)
+            notes_bbox_int.append(bbx)
+    tmp_pge = notes_pages_int[0]
+    tmpbbox = notes_bbox_int[0]
+    for pge,bbox in zip(notes_pages_int,notes_bbox_int):
         if pge < tmp_pge:
             tmp_pge = pge
             tmpbbox = bbox
@@ -84,7 +90,7 @@ def get_first_note_occurance(notes_pages,notes_bbox):
     return final_page,final_bbox
 
 
-def refinement(page_list,bbox_list):
+def refinement(page_list,bbox_list,max_main_page):
     filtered_pages = []
     filtered_bbox = []
     final_page = []
@@ -94,7 +100,7 @@ def refinement(page_list,bbox_list):
             filtered_pages.append(page)
             filtered_bbox.append(bbox)
     if len(filtered_pages)>1:
-        filtered_pages,filtered_bbox = get_first_note_occurance(filtered_pages,filtered_bbox)
+        filtered_pages,filtered_bbox = get_first_note_occurance(filtered_pages,filtered_bbox,max_main_page)
     return filtered_pages,filtered_bbox
 
 

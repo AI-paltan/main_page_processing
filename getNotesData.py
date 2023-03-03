@@ -46,7 +46,7 @@ class getNotesDataTables:
                     # note_pattern = str(note)+str(subnote)
                     note_pattern = get_note_pattern(note,subnote)
                     notes_pages,notes_start_bbox= find_note_start_index(note_pattern,account,self.ocr_line_df_dict,self.max_main_page)
-                    notes_pages,notes_start_bbox = refinement(notes_pages,notes_start_bbox)
+                    notes_pages,notes_start_bbox = refinement(notes_pages,notes_start_bbox,self.max_main_page)
                     next_note,next_subnote = find_next_note_subnote(note,subnote)
                     # next_note_pattern = next_note+next_subnote
                     if len(subnote)>0:
@@ -55,7 +55,7 @@ class getNotesDataTables:
                     else:
                         next_note_pattern = next_note
                         notes_end_page,notes_end_bbox = find_note_end_index(notes_pages,notes_start_bbox,self.ocr_line_df_dict,next_note_pattern)                
-                    notes_end_page,notes_end_bbox = refinement(notes_end_page,notes_end_bbox)
+                    notes_end_page,notes_end_bbox = refinement(notes_end_page,notes_end_bbox,self.max_main_page)
                     # print(f"note_patter:{note_pattern} {account}")
                     # print("notes pages and notes start bbox: ",notes_pages,notes_start_bbox)
                     # print("nextnote pattern: ",next_note_pattern)

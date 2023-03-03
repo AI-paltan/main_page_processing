@@ -82,7 +82,7 @@ class RefactorCBS:
         return standard_df , temp_df
 
     def non_ideal_format_processing(self):
-        self.df = self.df.iloc[:,4]  # select first 4 columns
+        self.df = self.df.iloc[:,:4]  # select first 4 columns
         standard_df,temp_df = self.ideal_format_processing()
         temp_df["total_columns"] = 6
         return standard_df,temp_df
