@@ -110,7 +110,8 @@ class getNotesDataTables:
                         table_df = pd.read_html(table.html_string)[0]
                         unique_rows = list(np.array(list(set(row_number)))-1)
                         if len(unique_rows) > 1:
-                            cropped_df = table_df.iloc[unique_rows]
+                            # cropped_df = table_df.iloc[unique_rows]
+                            cropped_df = table_df.iloc[table_df.index.isin(unique_rows)] 
                             cropped_df = cropped_df.reset_index(drop=True)
                             processed_tables.append(table.tableid)
                             append_table_list.append(table)

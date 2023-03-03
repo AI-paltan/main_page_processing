@@ -7,7 +7,7 @@ import numpy as np
 
 
 def note_end_testing(note_pattern,text_line):
-    flag = bool(re.match(r"([A-Za-z]*)(\s*)({})([^0-9]+|\s+)".format(note_pattern),text_line.lower()))
+    flag = bool(re.match(r"([A-Za-z]*)(\s*)({})([^0-9]+|\s+)".format(re.escape(note_pattern)),text_line))  #removing lowering of text line and adding re.escape
     return flag
 
 
@@ -63,7 +63,7 @@ def find_next_note_subnote(note,subnote=''):
 
 
 def x_cord_filter(bbox):
-    if int(bbox[0]) < 250 : #200: ## issue ovserved with TIC so increase x limit . limit 250 for ar fy 21
+    if int(bbox[0]) < 250: #200: ## issue ovserved with TIC so increase x limit . limit 250 for ar fy 21
         return True
     else:
         return False
