@@ -18,6 +18,18 @@ def get_notes_pages_keyowrds(df_nlp_bucket_master,df_meta_keyword):
     list_target_keywords = bucket_row['note_keyword'].values[0].split('|')
     return list_target_keywords
 
+def get_main_page_exclude_keywords(df_nlp_bucket_master,df_meta_keyword):
+    bucket_row  = df_nlp_bucket_master[df_nlp_bucket_master['meta_keyword']==df_meta_keyword]
+    # list_target_keywords = []
+    # for idx,row in bucket_row.iterrows():
+    list_target_keywords = bucket_row['exclude_target_keyword'].values[0].split('|')
+    return list_target_keywords
+
+def get_notes_pages_exclude_keyowrds(df_nlp_bucket_master,df_meta_keyword):
+    bucket_row  = df_nlp_bucket_master[df_nlp_bucket_master['meta_keyword']==df_meta_keyword]
+    list_target_keywords = bucket_row['exclude_note_keyword'].values[0].split('|')
+    return list_target_keywords
+
 def strip_string_bullets(str_txt,obj_techfuzzy):
         strip_string_bullets_str = obj_techfuzzy.strip_string_bullets(str_txt)
         # remove multi space between words              
