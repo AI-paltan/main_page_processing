@@ -30,6 +30,13 @@ def get_notes_pages_exclude_keyowrds(df_nlp_bucket_master,df_meta_keyword):
     list_target_keywords = bucket_row['exclude_note_keyword'].values[0].split('|')
     return list_target_keywords
 
+def get_section_subsection_matchType(df_nlp_bucket_master,df_meta_keyword):
+    bucket_row  = df_nlp_bucket_master[df_nlp_bucket_master['meta_keyword']==df_meta_keyword]
+    section = bucket_row['statement_section'].values[0]
+    subsection = bucket_row['statement_sub_section'].values[0]
+    match_type = bucket_row['match_type'].values[0]
+    return section,subsection,match_type
+
 def strip_string_bullets(str_txt,obj_techfuzzy):
         strip_string_bullets_str = obj_techfuzzy.strip_string_bullets(str_txt)
         # remove multi space between words              
@@ -37,7 +44,7 @@ def strip_string_bullets(str_txt,obj_techfuzzy):
         return strip_string_bullets_str
 
 def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,conf_score_thresh,match_type='partial'):
-    best_match = {'data_index': [], 'score': 0, 'value': 0, 'label': [],'note_numbers':[]}
+    best_match = {'data_index': [], 'score': 0, 'value': 0, 'line_item_label': [],'note_numbers':[],'line_item_value':[]}
     for data_index, data_row in df_datasheet.iterrows():
             # skip if data value is already found for bucketing
             # app.logger.debug(data_row["Particulars"])
@@ -60,7 +67,8 @@ def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,conf_
                 # if len(data_row['Notes']) > 1:
                 (best_match['note_numbers']).append(data_row['Notes'])
                 # self.cbs_drilldown_items(bucket_row, data_row)
-                (best_match['label']).append(data_row[str("Particulars")])
+                (best_match['line_item_label']).append(data_row[str("Particulars")])
+                (best_match['line_item_value']).append(float(data_row[curr_year]))
 
     return best_match
 
@@ -76,7 +84,7 @@ def get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_m
     tableid_list_main = []
     prcoessed_tabelids = []
     # print(notes_region_meta_data)
-    for account,note_nums in zip(main_page_best_match.get('label'),main_page_best_match.get('note_numbers')):
+    for account,note_nums in zip(main_page_best_match.get('line_item_label'),main_page_best_match.get('note_numbers')):
         # print(f"account: {account} and note= {note_nums}")
         # if len(note_nums) >= 1:
         reference_notes_dict = notes_reference_dict.get(statement_type)
