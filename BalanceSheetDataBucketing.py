@@ -93,7 +93,7 @@ class BalanceSheetDataBucketing():
         years_list.sort()
         self.years_list = [str(i) for i in years_list]
 
-    def get_cdm_item_data_buckets(self,main_page_targat_keywords,df_datasheet,match_type):
+    def get_cdm_item_data_buckets(self,main_page_targat_keywords,df_datasheet,match_type,note_page_include_keywords=[],notes_page_exclude_keywords=[]):
         notes_table_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
         main_page_data_indices = []
         main_page_year_total_lst = []
@@ -114,7 +114,11 @@ class BalanceSheetDataBucketing():
         filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list = get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match=main_page_best_match,notes_reference_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,trasnformed_standardised_cropped_dict=self.transformed_standardised_cropped_dict,statement_type="cbs")
         # print(f"1.raw_note_list: {raw_note_list},note_number_list: {note_number_list},sbnoue: {subnote_number_list},tableid:{tableid_list}")
         # print(f"len of std dict {len(filtered_standardised_tables_dict)} and len of trasnformed std dict: {len(filtered_transformed_standardised_tables_dict)}")
-        temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
+        noted_dict_respnse_after_filtering_keywrods = get_notes_dfDict_after_filtering_keywords(note_number_list=note_number_list,subnote_number_list=subnote_number_list,tableid_list=tableid_list,filtered_transformed_standardised_tables_dict=filtered_transformed_standardised_tables_dict,obj_techfuzzy=self.obj_techfuzzy,conf_score=self.conf_score_thresh,match_type='partial',notes_include_keywords=note_page_include_keywords,notes_exclude_keywords=notes_page_exclude_keywords)
+        # temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
+        # print("new meta dict")
+        # print(noted_dict_respnse_after_filtering_keywrods)
+        temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,noted_dict_respnse_after_filtering_keywrods)
         notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
         main_page_raw_note_list = raw_note_list
             # get_notes_pages_line_items()
@@ -132,6 +136,7 @@ class BalanceSheetDataBucketing():
         meta_keywrods = "ca_cash_and_cash_equivalents"
         main_page_targat_keywords = get_main_page_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        notes_page_exlude_keywords = get_notes_pages_exclude_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         # notes_table_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
         # main_page_data_indices = []
         # main_page_year_total_lst = []
