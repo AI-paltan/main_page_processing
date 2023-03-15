@@ -250,6 +250,7 @@ def prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,ta
 
 def prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,tableid_list,noted_dict_respnse_after_filtering_keywrods):
     temp_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
+    temp_horizontal_df = pd.DataFrame()
     for raw_note,note,subnote,tableid in zip(raw_note_list,note_number_list,subnote_number_list,tableid_list):
         std_df = pd.DataFrame(columns=["raw_note_no","note_no","subnote_no","line_item","year","value"])
         combo_key = str(note)+"_"+str(subnote)+"_"+str(tableid)
@@ -260,8 +261,27 @@ def prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,t
                 std_df["line_item"] =  _df[["columns","rows"]].fillna('').apply(" ".join, axis=1)
                 std_df["year"] = _df["year"]
                 std_df["value"] = _df["value"]
+                horizontal_note_df = convert_note_df_to_hotizontal(std_df)
+                temp_horizontal_df = temp_horizontal_df.append(horizontal_note_df)
         std_df["raw_note_no"]=raw_note
         std_df["note_no"]=note
         std_df["subnote_no"]=subnote
         temp_df = pd.concat([temp_df,std_df],ignore_index=True)
-    return temp_df
+    return temp_df,temp_horizontal_df
+
+
+def convert_note_df_to_hotizontal(note_df):
+    years = sorted(list(note_df.year.unique()))
+    years = map(int, years)
+    col_list = ["line_item"]
+    col_list.extend(years)
+    new_horizontal_note_df = pd.DataFrame(columns=col_list)
+    for idx,row in note_df.iterrows():
+        if row["line_item"] in set(new_horizontal_note_df['line_item']):
+            new_horizontal_note_df.loc[new_horizontal_note_df.line_item == row["line_item"],row["year"]] = row["value"]
+        else:
+            tmp_df = dict.fromkeys(col_list)
+            tmp_df["line_item"] =  row["line_item"]
+            tmp_df[row["year"]] = row["value"]
+            new_horizontal_note_df = new_horizontal_note_df.append(tmp_df, ignore_index=True)
+    return new_horizontal_note_df
