@@ -258,11 +258,12 @@ def prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,t
             # _df = filtered_transformed_standardised_tables_dict.get(tableid)
             if key == combo_key:
                 _df = value
-                std_df["line_item"] =  _df[["columns","rows"]].fillna('').apply(" ".join, axis=1)
-                std_df["year"] = _df["year"]
-                std_df["value"] = _df["value"]
-                horizontal_note_df = convert_note_df_to_hotizontal(std_df)
-                temp_horizontal_df = temp_horizontal_df.append(horizontal_note_df)
+                if len(_df)>0:
+                    std_df["line_item"] =  _df[["columns","rows"]].fillna('').apply(" ".join, axis=1)
+                    std_df["year"] = _df["year"]
+                    std_df["value"] = _df["value"]
+                    horizontal_note_df = convert_note_df_to_hotizontal(std_df)
+                    temp_horizontal_df = temp_horizontal_df.append(horizontal_note_df)
         std_df["raw_note_no"]=raw_note
         std_df["note_no"]=note
         std_df["subnote_no"]=subnote
