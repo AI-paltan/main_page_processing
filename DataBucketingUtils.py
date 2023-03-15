@@ -285,3 +285,12 @@ def convert_note_df_to_hotizontal(note_df):
             tmp_df[row["year"]] = row["value"]
             new_horizontal_note_df = new_horizontal_note_df.append(tmp_df, ignore_index=True)
     return new_horizontal_note_df
+
+
+def get_matched_main_page_df(main_page_data_indices,df):
+    # if len(main_page_data_indices)>0:
+    # print(df)
+    matched_main_page_df = df.iloc[main_page_data_indices]
+    # else:
+    #     matched_main_page_df = df
+    return matched_main_page_df
