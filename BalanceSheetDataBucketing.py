@@ -121,7 +121,7 @@ class BalanceSheetDataBucketing():
         temp_df,temp_horizontal_df = prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,tableid_list,noted_dict_respnse_after_filtering_keywrods)
         notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
         main_page_raw_note_list = raw_note_list
-        print(main_page_data_indices)
+        # print(main_page_data_indices)
         matched_main_page_df = get_matched_main_page_df(main_page_data_indices=main_page_data_indices,df=self.df_datasheet)
 
             # get_notes_pages_line_items()
