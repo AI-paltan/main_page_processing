@@ -218,6 +218,7 @@ def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_di
                 notes_list = split_notes_list
             else:
                  notes_list = [str(val)]
+            notes_list = [i.strip() for i in notes_list]
             note_no : list= []
             subnote_no : list = []
             for raw_note in notes_list:

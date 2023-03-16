@@ -27,6 +27,7 @@ def find_note_start_index(note_pattern,account_text,ocr_line_df_dict,max_main_pa
 def find_note_end_index(start_page_number,start_bbox,ocr_line_df_dict,next_note_pattern):
     end_page_number = []
     end_bbox= []
+    pattern_found_flag = False
     for k,df in ocr_line_df_dict.items():
         for strt_page in start_page_number:
             if k>=strt_page and k<=strt_page+1:
@@ -35,11 +36,13 @@ def find_note_end_index(start_page_number,start_bbox,ocr_line_df_dict,next_note_
                     if flag:
                         end_page_number.append(k)
                         end_bbox.append([row['left'],row['top'],row['right'],row['down']])
+                        pattern_found_flag = True
         ### below code is to find next page end bbox if strat page bbox present and next note bbox not found 
-#         if len(end_bbox)==0 and len(end_page_number)==0  and if len(start_page_number)>0:
-#             end_page_number = int(start_page_number[0])+1
-#             end_bbox = ocr_line_df_dict[int(start_page_number[0])+1].
-    return end_page_number,end_bbox
+    if len(end_bbox)==0 and len(end_page_number)==0  and len(start_page_number)>0:
+        end_page_number.append(int(start_page_number[0])+1)
+        end_row_end_page = ocr_line_df_dict[int(start_page_number[0])+1].iloc[-1,:]
+        end_bbox.append([end_row_end_page['left'],end_row_end_page['top'],end_row_end_page['right'],end_row_end_page['down']])
+    return end_page_number,end_bbox,pattern_found_flag
 
 
 def find_next_note_subnote(note,subnote=''):
