@@ -75,7 +75,7 @@ class getNotesDataTables:
                             if len(notes_end_page)<=0:
                                 pass
                         if pattern_found_flag:
-                            notes_end_page,notes_end_bbox = refinement(notes_end_page,notes_end_bbox)
+                            notes_end_page,notes_end_bbox = refinement(notes_end_page,notes_end_bbox,self.max_main_page)
                         # print(f"subnote note_patter:{note_pattern} {account}")
                         # print("subnote notes pages and notes start bbox: ",notes_pages,notes_start_bbox)
                         # print("subote nextnote and next subnote: ",next_note,next_subnote)
