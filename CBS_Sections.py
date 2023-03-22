@@ -65,7 +65,7 @@ class CBSsections:
                 particular_text = self.string_cleaning(df_row['Particulars'])
 
                 fuzz_res = obj_techfuzzy.token_sort_pro(particular_text, list_main_sections)
-                # app.logger.info(f'{particular_text} | {fuzz_res}')
+                # print(f'{particular_text} | {fuzz_res}')
                 if fuzz_res[0][1] >= fuzz_thresh:
                     for key, value in dict_main_sections.items():
                         if fuzz_res[0][0] in value:
