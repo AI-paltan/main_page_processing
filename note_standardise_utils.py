@@ -191,14 +191,22 @@ def find_date_location(df):
                             row_numbers.append([idx])
                             raw_text.append([raw_year])
                             extracted_year.append([extract_year])
-                    break
-                elif regex_year_found:
+                        else:
+                            row_date_flag = False
+                    if row_date_flag:
+                        break
+                # elif regex_year_found:
+                if (regex_year_found) & (not row_date_flag):
                     for col,raw_year,extract_year in zip(year_indices,raw_year_text,year_list):
                         if (int(extract_year) <= int(date.today().year) ) & (int(extract_year)>=(int(date.today().year))-5):
                             columns_number.append(col)
                             row_numbers.append([idx])
                             raw_text.append([raw_year])
                             extracted_year.append([extract_year])
+                        else:
+                            regex_year_found = False
+                    if regex_year_found:    
+                        break
                     
             
         # print(row_date_flag,regex_year_found,columns_number,row_numbers,raw_text,extracted_year)
