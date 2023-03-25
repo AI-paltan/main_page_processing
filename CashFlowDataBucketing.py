@@ -83,7 +83,7 @@ class CashFlowDataBucketing():
 
         # TODO remove temporary code
         rem_cols = ['id', 'statement_section', 'statement_sub_section', 'statement_type', 'target_keyword',
-                    'fetch_type', 'template_row_map', 'sequence_view', 'match_type',
+                    'fetch_type', 'sequence_view', 'match_type',
                     'note_keyword', 'flag_model_training', 'field_tage', 'remarks', 'custom_formula', 'ref_notes_key']
 
         # get years list and sort in asc order

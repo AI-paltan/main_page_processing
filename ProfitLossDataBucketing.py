@@ -266,7 +266,15 @@ class ProfitLossDataBucketing():
         self.pl_bucketing_dict[meta_keywrods] = temp_dict
 
     def get_OTHERS(self):
-        pass
+        meta_keywrods = "smr_other"
+        main_page_targat_keywords = get_main_page_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        main_page_exclude_keywords = get_main_page_exclude_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        note_page_exclude_keywords = get_notes_pages_exclude_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        section,subsection,match_type = get_section_subsection_matchType(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords,match_type=match_type,note_page_include_keywords=note_page_notes_keywords,notes_page_exclude_keywords=note_page_exclude_keywords)
+
+        self.pl_bucketing_dict[meta_keywrods] = temp_dict
 
 
   
