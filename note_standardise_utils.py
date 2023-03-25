@@ -207,8 +207,11 @@ def find_date_location(df):
                             regex_year_found = False
                     if regex_year_found:    
                         break
-                    
-            
+        # print(f"before: ",df)            
+        # if len(columns_number)>0:
+        #     for row,col,year in zip(row_numbers,columns_number,extracted_year):
+        #         df.iloc[row,col] = year
+        # print(f"after : ",df)
         # print(row_date_flag,regex_year_found,columns_number,row_numbers,raw_text,extracted_year)
         return row_date_flag,regex_year_found,columns_number,row_numbers,raw_text,extracted_year
     
@@ -446,8 +449,18 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
         if col_subscript >=0:
             # print(fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime,unit='ns'))
             try:
-                fin_df['year'] = fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime).dt.year
-                year_column_header_name = f"header_col_{col_subscript}"
+                ## fixing 1970 issue
+                extract_yr_sries = fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime).dt.year
+                if (extract_yr_sries <= int(date.today().year)).any() & (extract_yr_sries>=(int(date.today().year))-5).any(): 
+                    for idx,row in fin_df.iterrows():
+                        year = get_regex_year(str(row[f"header_col_{col_subscript}"]))
+                        if int(year)>0:
+                            fin_df.at[idx,'year'] = year
+                            year_column_header_name = f"header_col_{col_subscript}"
+                else:
+                    fin_df['year'] = fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime).dt.year
+                    year_column_header_name = f"header_col_{col_subscript}"
+                    
             except:
                 for idx,row in fin_df.iterrows():
                     year = get_regex_year(str(row[f"header_col_{col_subscript}"]))
@@ -486,6 +499,47 @@ def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
                             break    
         return fin_df,year_column_header_name
     
+
+def set_year_column_for_final_df2(fin_df,date_coordinates,header_indices,raw_year,extracted_year):
+    if len(date_coordinates[0])>0:
+        col_subscript = -1
+        row_indices = []
+        fin_df['year'] = None
+        year_column_header_name = ' '
+        header_indices = sorted(header_indices,reverse=True)
+        for column,rows in zip(date_coordinates[0],date_coordinates[1]):
+                if column > 0:
+                    col_subscript = header_indices.index(rows[0])
+                elif column == 0:
+                    row_indices = rows
+        # print(col_subscript)
+        if col_subscript >=0:
+            # print(fin_df[f"header_col_{col_subscript}"].transform(pd.to_datetime,unit='ns'))
+            for idx,row in fin_df.iterrows():
+                for raw_year_text,year in zip(raw_year,extracted_year):
+                    if str(row[f"header_col_{col_subscript}"]).lower().strip() == str(raw_year_text[0]).lower().strip():
+                        fin_df.at[idx,'year'] = year[0]
+            year_column_header_name = f"header_col_{col_subscript}"
+        else:
+            row_header_flag = False
+            if 'row_header' in fin_df.columns:
+                cnt = 0
+                for idx,row in fin_df.iterrows():
+                    for raw_year_text,year in zip(raw_year,extracted_year):
+                        if str(row[f"row_header"]).lower().strip() == str(raw_year_text[0]).lower().strip():
+                            fin_df.at[idx,'year'] = year[0]
+                            cnt =cnt+1
+                    if cnt >=2:
+                        row_header_flag = True              
+                # print(row_header_flag)
+            if not row_header_flag:
+                cnt = 0
+                for col_header , line_row in fin_df.filter(like="line_item", axis=1).iteritems():
+                    for idx,line_item in enumerate(line_row):
+                        for raw_year_text,year in zip(raw_year,extracted_year):
+                            if str(line_item).lower().strip() == str(raw_year_text).lower().strip():
+                                fin_df.at[idx,'year'] = year
+        return fin_df,year_column_header_name
 
 # def set_year_column_for_final_df(fin_df,date_coordinates,header_indices):
 #     if len(date_coordinates[0])>0:
