@@ -54,7 +54,7 @@ class mainPageProcess:
         self.fileid=fileid
         self.get_standardize_main_pages()
         self.merge_df() # if any statement spans over 2 pages
-        self.notes_number_processing()
+        self.notes_number_processing_cls()
         self.set_sections_subsections()
         # self.find_note_page_area()
         self.get_note_data_tables()
@@ -136,7 +136,7 @@ class mainPageProcess:
                 if k!= min_keys:
                     del self.ccf_df_dict[k]
     
-    def notes_number_processing(self):
+    def notes_number_processing_cls(self):
         notes_dict = NestedDefaultDict()
         cbs_key = list(self.cbs_df_dict.keys())[0]
         cpl_key = list(self.cpl_df_dict.keys())[0]
