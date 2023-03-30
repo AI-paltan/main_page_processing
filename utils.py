@@ -39,7 +39,7 @@ def get_years_and_positions_with_notes(df,notes_indices):
                     year_val = value
                 elif len(value) == 2:
                     year_val = '20'+str(value)
-                if int(year_val) <= int(date.today().year):
+                if int(year_val) <= int(date.today().year) and int(year_val)>=(int(date.today().year)-6):
                     return str(year_val)        
         else:
             return year_val
@@ -50,13 +50,17 @@ def get_years_and_positions_with_notes(df,notes_indices):
     year_indices: List(List) = []
     raw_year_text:list = []
     for idx,row in df.iterrows():
+        year_list: list = []
+        year_indices: List(List) = []
+        raw_year_text:list = []
         if (note_x-2) <= idx <= (note_x+2):
             for col_idx, item in row.iteritems():
                 if col_idx > note_y:
-                    try:
-                        year = parser.parse(str(item), fuzzy=True).year
-                    except:
-                        year = get_regex_year(str(item))
+                    # try:
+                    #     year = parser.parse(str(item), fuzzy=True).year
+                    # except:
+                    #     year = get_regex_year(str(item))
+                    year = get_regex_year(str(item))
                     if int(year) > 0:
                         year_list.append(int(year))
                         year_indices.append([idx,col_idx])
@@ -79,7 +83,7 @@ def get_years_and_positions_without_notes(df):
                     year_val = value
                 elif len(value) == 2:
                     year_val = '20'+str(value)
-                if int(year_val) <= int(date.today().year):
+                if int(year_val) <= int(date.today().year) and int(year_val)>=(int(date.today().year)-6):
                     return str(year_val)        
         else:
             return year_val
@@ -89,12 +93,16 @@ def get_years_and_positions_without_notes(df):
     raw_year_text:list = []
     for idx,row in df.iterrows():
         # if (note_x-2) < idx < (note_x+2):
+        year_list: list = []
+        year_indices: List(List) = []
+        raw_year_text:list = []
         for col_idx, item in row.iteritems():
             if col_idx > 0:
-                try:
-                    year = parser.parse(str(item), fuzzy=True).year
-                except:
-                    year = get_regex_year(str(item))
+                # try:
+                #     year = parser.parse(str(item), fuzzy=True).year
+                # except:
+                #     year = get_regex_year(str(item))
+                year = get_regex_year(str(item))
                 if year and int(year) > 0:
                     year_list.append(int(year))
                     year_indices.append([idx,col_idx])
@@ -203,6 +211,7 @@ def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_di
     notes_col = df['Notes']
     # particulars_col = df.iloc[notes_indices[0]+1:,particulars_y]
     particulars_col = df['Particulars']
+    year_col_list = [i for i in df.columns if i not in ["Notes","Particulars"]]
     ref_list : list = []
     for idx,val in enumerate(notes_col):
         notes_list = []
@@ -231,6 +240,10 @@ def notes_number_processing(df,notes_indices,data_start_x,particulars_y,notes_di
             temp_dict['processed_raw_note'] = notes_list
             temp_dict['main_note_number']=note_no
             temp_dict['subnote_number'] = subnote_no
+            tmp_year_value_dct = {}
+            for year in year_col_list:
+                tmp_year_value_dct[year] = df.iloc[idx][year]
+            temp_dict["year_values"] = tmp_year_value_dct
             ref_list.append(temp_dict)
             # print(note_no)
             for noteno,subnoteno in zip(note_no,subnote_no):

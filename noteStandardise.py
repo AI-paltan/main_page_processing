@@ -33,9 +33,12 @@ class NoteStandardised:
                 final_df = pd.DataFrame()
                 meta_dict : Dict = {}
                 final_transformed_df = pd.DataFrame()
+                # print(f"key :{key}")
                 try:
                     note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
                     columns_number,row_number,raw_text,extracted_year = find_date_location(note_df)
+                    
+                    # print(columns_number,row_number,raw_text,extracted_year)
                     data_row_coords,particular_end_col,particular_start_row = find_data_block_location(note_df=note_df.copy(),date_block_coordinates=(columns_number,row_number))
                     header_indices = find_col_headers(note_df,data_row_coords,particular_end_col,particular_start_row)
                     nte_df,particular_end_col = check_and_remove_duplicate_particulars_column(note_df,particular_end_col,particular_start_row)
@@ -48,6 +51,7 @@ class NoteStandardised:
                     # print(header_indices)
                     # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
                     final_df,year_column_header_name = set_year_column_for_final_df2(fin_df,(columns_number,row_number),header_indices,raw_text,extracted_year)
+                    # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
                     final_df = numbers_processing(final_df)
                     final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
                     meta_dict["date_column_number"] = columns_number

@@ -39,8 +39,11 @@ class DataDump:
         df_crm_nlp_bucket_master = db.query(db_models.CRM_nlp_bucketing)
         crm_nlp_df = pd.read_sql(df_crm_nlp_bucket_master.statement, df_crm_nlp_bucket_master.session.bind)
         bs_crm_nlp_df = crm_nlp_df[crm_nlp_df['statement_type']==statement_type]
-        bs_crm_nlp_df_sorted_rev = bs_crm_nlp_df.sort_values(by='cdm_keyword_start_row_map',ascending=False)
-        return bs_crm_nlp_df_sorted_rev
+        bs_crm_nlp_df['sort'] = pd.to_numeric(bs_crm_nlp_df['cdm_keyword_start_row_map'],errors="coerce")
+        bs_crm_nlp_df.sort_values('sort',inplace=True, ascending=False)
+        bs_crm_nlp_df = bs_crm_nlp_df.drop('sort', axis=1)
+        # bs_crm_nlp_df_sorted_rev = bs_crm_nlp_df.sort_values(by='cdm_keyword_start_row_map',ascending=False)
+        return bs_crm_nlp_df
     
     def get_month(self,):
         file_query = db.query(db_models.FileLogs).filter(db_models.FileLogs.fileid == self.fileid).first()

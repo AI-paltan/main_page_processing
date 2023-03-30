@@ -295,3 +295,41 @@ def get_matched_main_page_df(main_page_data_indices,df):
     # else:
     #     matched_main_page_df = df
     return matched_main_page_df
+
+
+def clean_note_df(std_horzntl_note_df):
+    # patterns = ["consolidated","$000","$"]
+    patterns = ["consolidated","$000","$"]
+    for pattrn in patterns:
+        std_horzntl_note_df["line_item"] = std_horzntl_note_df["line_item"].str.replace(pattrn,'',flags=re.IGNORECASE)
+
+    return std_horzntl_note_df
+
+
+
+
+def remove_total_line_items(std_horzntl_note_df):
+    remove_indices = []
+    for idx,row in std_horzntl_note_df.iterrows():
+        if "total" in row["line_item"].lower():
+            remove_indices.append(idx)
+    if len(remove_indices)>0:
+        std_horzntl_note_df.drop(remove_indices,inplace=True)
+    std_horzntl_note_df.reset_index(drop=True,inplace=True)
+    return std_horzntl_note_df
+
+def remove_0_value_line_items(std_horzntl_note_df):
+    year_cols = [i for i in std_horzntl_note_df.columns if i not in ["line_item"]]
+    std_horzntl_note_df[year_cols] = std_horzntl_note_df[year_cols].fillna(value=0)
+    remove_indics = []
+    for idx,row in std_horzntl_note_df.iterrows():
+        sum = 0
+        for year in year_cols:
+            sum = sum+year
+        if sum == 0:
+            remove_indics.append(idx)
+    if len(remove_indics)>0:
+        std_horzntl_note_df.drop(remove_indics,inplace=True)
+    std_horzntl_note_df.reset_index(drop=True,inplace=True)
+
+    return std_horzntl_note_df
