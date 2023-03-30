@@ -651,15 +651,14 @@ def numbers_processing(df):
 #     for idx,row in df.iterrows()
     return df
 
-def set_totalKeyword_line_items(nte_df):
+def set_totalKeyword_line_items(nte_df,particulars_endcol_coordinates,particulars_start_row):
     # year_columns = [i for i in std_horzntl_note_df.columns if i not in ["line_item"]]
     blankrows = []
-    def find_row_headers(nte_df,particulars_endcol_coordinates,particulars_start_row,particulars_start_col):
-        for idx,row in nte_df.iterrows():
-            if idx >= particulars_start_row:
-                if not row[0:particulars_endcol_coordinates+1].notnull().any():
-                    blankrows.append(idx)
-                    nte_df.at[idx,particulars_start_col] = "Total"
+    for idx,row in nte_df.iterrows():
+        if idx >= particulars_start_row:
+            if not row[0:particulars_endcol_coordinates+1].notnull().any():
+                blankrows.append(idx)
+                nte_df.at[idx,0] = "Total"
     return blankrows,nte_df
 
 
