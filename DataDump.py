@@ -50,7 +50,7 @@ class DataDump:
         self.month = file_query.month
     
     def set_years_header(self):
-        max_year = max(self.year_list)
+        max_year = max(self.years_list)
         financial_year_pattern = str(max_year)
         if self.month == "december":
             financial_year_pattern = str(max_year)+ '/' + str('12')
@@ -84,7 +84,9 @@ class DataDump:
                 if row["cdm_keyword_start_row_map"].isdigit():
                     cbs_worksheet = self.report_workbook.get_sheet_by_name(row['cdm_sheet_name'])
                     repsonse_dict = cbs_resposne_bucket.get(row['meta_keyword'])
-                    notes_horizontal_table_df = repsonse_dict.get('notes_horizontal_table_df')     
+                    notes_horizontal_table_df = repsonse_dict.get('notes_horizontal_table_df')  
+                    # total_row_num  = int(row["cdm_total_row_map"]) 
+                    # cbs_worksheet.cell(row=total_row_num,column=year_column).value = row_note[year]
                     if len(notes_horizontal_table_df)>0:
                         # print("len: ", len(notes_horizontal_table_df))
                         cbs_worksheet = self.insert_rows(worksheet=cbs_worksheet,df_len=len(notes_horizontal_table_df),start_template_rwo=row["cdm_keyword_start_row_map"],total_end_template_row=row["cdm_total_row_map"])
@@ -97,6 +99,13 @@ class DataDump:
                                     cbs_worksheet.cell(row=excel_row_num,column=year_column).value = row_note[year]
                                 except:
                                     cbs_worksheet.cell(row=excel_row_num,column=year_column).value = 0.0
+                    total_row_num  = int(row["cdm_total_row_map"]) 
+                    for main_year,value in zip(repsonse_dict.get("main_page_year_list"),repsonse_dict.get("main_page_year_total")):
+                        year_column = year_excel_col_map_dict.get(int(year))
+                        try:
+                            cbs_worksheet.cell(row=total_row_num,column=year_column).value = value
+                        except:
+                            cbs_worksheet.cell(row=total_row_num,column=year_column).value = 0.0
 
 
     def get_row_map_from_db(self,meta_keyword):

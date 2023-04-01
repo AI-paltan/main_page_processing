@@ -10,7 +10,7 @@ from DataBucketingUtils import *
 
 
 class BalanceSheetDataBucketing():
-    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict):
+    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict,month):
         self.df_datasheet = df_datasheet
         self.df_nlp_bucket_master = df_nlp_bucket_master
         self.df_datasheet_cp = df_datasheet.copy()
@@ -19,7 +19,7 @@ class BalanceSheetDataBucketing():
         self.standardised_cropped_dict = standardised_cropped_dict
         self.standard_note_meta_dict = standard_note_meta_dict
         self.transformed_standardised_cropped_dict = transformed_standardised_cropped_dict
-
+        self.month = month
         self.ps = PorterStemmer()
         self.conf_score_thresh = 80
         self.years_list = []
@@ -87,7 +87,6 @@ class BalanceSheetDataBucketing():
 
         # ignore these columns to fetch years list
         filter_headers = ['Notes', 'Particulars', 'statement_section', 'statement_sub_section']
-
         # get years list
         years_list = ([int(i) for i in data_column_names if i not in filter_headers])
         years_list.sort()
@@ -100,6 +99,8 @@ class BalanceSheetDataBucketing():
         main_page_raw_note_list = []
         main_page_particular_text_list = []
         main_page_value_list = []
+        ## clear total keyowrds line items from main pages
+        df_datasheet = remove_total_lines_main_pages(df_datasheet=df_datasheet,filepath=keyword_mapping_settings.mastersheet_filter_particulars,statement_type='cbs',obj_techfuzzy=self.obj_techfuzzy)
         for year in self.years_list:
             # print(year)
             main_page_best_match= get_main_page_line_items(df_datasheet=df_datasheet,keywords=main_page_targat_keywords,curr_year=year,obj_techfuzzy=self.obj_techfuzzy,conf_score_thresh=self.conf_score_thresh,match_type=match_type)
@@ -123,7 +124,8 @@ class BalanceSheetDataBucketing():
         main_page_raw_note_list = raw_note_list
         # print(main_page_data_indices)
         matched_main_page_df = get_matched_main_page_df(main_page_data_indices=main_page_data_indices,df=self.df_datasheet)
-
+        ## psoprocess horizontal standardised notes df
+        temp_horizontal_df = postprocessing_note_df(std_hrzntl_nte_df=temp_horizontal_df)
             # get_notes_pages_line_items()
         temp_dict ={}
         temp_dict["main_page_row_indices"] = main_page_data_indices
@@ -209,22 +211,28 @@ class BalanceSheetDataBucketing():
         note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         section,subsection,match_type = get_section_subsection_matchType(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         df_data = self.df_datasheet[(self.df_datasheet["statement_section"]==section)&(self.df_datasheet["statement_sub_section"]==subsection)]
-        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type)
+        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type,note_page_include_keywords=note_page_notes_keywords)
         # temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords)
         self.bs_bucketing_dict[meta_keywrods] = temp_dict
 
     def get_ACCUMLATED_DEPRE(self):
-        meta_keywrods = "nca_net_ppe"
+        meta_keywrods = "nca_accumulated_depreciation"
+        # print(meta_keywrods)
         main_page_targat_keywords = get_main_page_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        note_page_exclude_note_keywords = get_notes_pages_exclude_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         section,subsection,match_type = get_section_subsection_matchType(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        # print(f"nca_accumulated_depreciation: ", note_page_notes_keywords)
         df_data = self.df_datasheet[(self.df_datasheet["statement_section"]==section)&(self.df_datasheet["statement_sub_section"]==subsection)]
-        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type)
+        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type,note_page_include_keywords=note_page_notes_keywords,notes_page_exclude_keywords=note_page_exclude_note_keywords)
         # temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords)
+        ### secodn level filtering based on month of annual report
+        hrzntl_df = temp_dict["notes_horizontal_table_df"]
+        temp_dict["notes_horizontal_table_df"] = second_filter_PPE(std_hrzntl_note_df=hrzntl_df,month=self.month)
         self.bs_bucketing_dict[meta_keywrods] = temp_dict
 
     def get_NET_PLANT_PRPTY_AND_EQPMNT(self):
-        meta_keywrods = "nca_gross_ppe"
+        meta_keywrods = "nca_net_ppe"
         main_page_targat_keywords = get_main_page_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         section,subsection,match_type = get_section_subsection_matchType(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
@@ -574,13 +582,19 @@ class BalanceSheetDataBucketing():
         self.bs_bucketing_dict[meta_keywrods] = temp_dict
 
     def get_GROS_PLANT_PRPTY_AND_EQPMNT(self):
-        meta_keywrods = "nca_accumulated_depreciation"
+        meta_keywrods = "nca_gross_ppe"
+        # print(meta_keywrods)
         main_page_targat_keywords = get_main_page_keywords(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         note_page_notes_keywords = get_notes_pages_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        note_page_exclude_note_keywords = get_notes_pages_exclude_keyowrds(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
+        # print(f"nca_gross_ppe: ", note_page_notes_keywords)
         section,subsection,match_type = get_section_subsection_matchType(df_nlp_bucket_master=self.df_nlp_bucket_master,df_meta_keyword=meta_keywrods)
         df_data = self.df_datasheet[(self.df_datasheet["statement_section"]==section)&(self.df_datasheet["statement_sub_section"]==subsection)]
-        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type)
+        temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords=main_page_targat_keywords,df_datasheet=df_data,match_type=match_type,note_page_include_keywords=note_page_notes_keywords,notes_page_exclude_keywords=note_page_exclude_note_keywords)
         # temp_dict = self.get_cdm_item_data_buckets(main_page_targat_keywords)
+        ### secodn level filtering based on month of annual report
+        hrzntl_df = temp_dict["notes_horizontal_table_df"]
+        temp_dict["notes_horizontal_table_df"] = second_filter_PPE(std_hrzntl_note_df=hrzntl_df,month=self.month)
         self.bs_bucketing_dict[meta_keywrods] = temp_dict
 
     def get_ACCOUNTS_RECEIVABLES(self):

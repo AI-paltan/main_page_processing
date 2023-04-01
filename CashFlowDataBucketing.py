@@ -5,6 +5,7 @@ from main_page_config import keyword_mapping_settings
 # from src.modules.data_processing.DataBucketingGeneric import DataBucketingGeneric
 import os
 from TechMagicFuzzy import TechMagicFuzzy
+from DataBucketingUtils import *
 
 """
 @author: jayesh.thukarul
@@ -100,6 +101,7 @@ class CashFlowDataBucketing():
     # data cleanup and add necessary columns for processing the bucketing logic
     def report_data_tuning(self):
         # get year list in integer form
+        self.df_datasheet = remove_total_lines_main_pages(df_datasheet=self.df_datasheet,filepath=keyword_mapping_settings.mastersheet_filter_particulars,statement_type='ccf',obj_techfuzzy=self.obj_techfuzzy)
         data_column_names = self.df_datasheet.columns.values
 
         # ignore these columns to fetch years list

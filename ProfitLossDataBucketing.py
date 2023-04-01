@@ -10,7 +10,7 @@ from DataBucketingUtils import *
 
 
 class ProfitLossDataBucketing():
-    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict):
+    def __init__(self, df_datasheet, df_nlp_bucket_master,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict,month):
         self.df_datasheet = df_datasheet
         self.df_nlp_bucket_master = df_nlp_bucket_master
         self.df_datasheet_cp = df_datasheet.copy()
@@ -19,6 +19,7 @@ class ProfitLossDataBucketing():
         self.standardised_cropped_dict = standardised_cropped_dict
         self.standard_note_meta_dict = standard_note_meta_dict
         self.transformed_standardised_cropped_dict = transformed_standardised_cropped_dict
+        self.month = month
 
         self.ps = PorterStemmer()
         self.conf_score_thresh = 80
@@ -99,6 +100,7 @@ class ProfitLossDataBucketing():
         main_page_raw_note_list = []
         main_page_particular_text_list = []
         main_page_value_list = []
+        self.df_datasheet = remove_total_lines_main_pages(df_datasheet=self.df_datasheet,filepath=keyword_mapping_settings.mastersheet_filter_particulars,statement_type='cpl',obj_techfuzzy=self.obj_techfuzzy)
         for year in self.years_list:
             # print(year)
             main_page_best_match= get_main_page_line_items(df_datasheet=self.df_datasheet,keywords=main_page_targat_keywords,curr_year=year,obj_techfuzzy=self.obj_techfuzzy,conf_score_thresh=self.conf_score_thresh,match_type=match_type)
@@ -121,6 +123,7 @@ class ProfitLossDataBucketing():
         notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
         main_page_raw_note_list = raw_note_list
         matched_main_page_df = get_matched_main_page_df(main_page_data_indices=main_page_data_indices,df=self.df_datasheet)
+        temp_horizontal_df = postprocessing_note_df(std_hrzntl_nte_df=temp_horizontal_df)
             # get_notes_pages_line_items()
         temp_dict ={}
         temp_dict["main_page_row_indices"] = main_page_data_indices

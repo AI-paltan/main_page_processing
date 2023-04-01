@@ -6,7 +6,7 @@ import pandas as pd
 db = get_db1()
 
 class CBSMapping:
-    def __init__(self,cbs_df,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict):
+    def __init__(self,cbs_df,month,notes_ref_dict,notes_region_meta_data,standardised_cropped_dict,standard_note_meta_dict,transformed_standardised_cropped_dict):
         self.datasheet = cbs_df
         self.df_nlp_bucket_master = pd.DataFrame()
         self.df_response = pd.DataFrame()
@@ -16,13 +16,14 @@ class CBSMapping:
         self.standard_note_meta_dict = standard_note_meta_dict
         self.transformed_standardised_cropped_dict = transformed_standardised_cropped_dict
         self.bs_bucket_dict = {}
+        self.month = month
 
     def trigger_job(self):
         self.get_nlp_bucket_df_from_db()
         self.calculate_CBS()
 
     def calculate_CBS(self):
-        obj_cbs_bucketing = BalanceSheetDataBucketing(df_datasheet=self.datasheet,df_nlp_bucket_master=self.df_nlp_bucket_master,notes_ref_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,standard_note_meta_dict=self.standard_note_meta_dict,transformed_standardised_cropped_dict= self.transformed_standardised_cropped_dict)
+        obj_cbs_bucketing = BalanceSheetDataBucketing(df_datasheet=self.datasheet,df_nlp_bucket_master=self.df_nlp_bucket_master,notes_ref_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,standard_note_meta_dict=self.standard_note_meta_dict,transformed_standardised_cropped_dict= self.transformed_standardised_cropped_dict,month=self.month)
         obj_cbs_bucketing.fetch_report()
         self.bs_bucket_dict = obj_cbs_bucketing.bs_bucketing_dict
         # self.df_response = obj_ccf_bucketing.df_response

@@ -22,6 +22,7 @@ class Main_Page_CoreSettings(BaseSettings):
 
 class Keyword_mapping_Settings(BaseSettings):
     ccf_section_subtotal_keywords :str = os.path.join(path.dirname(__file__),'keywords_library/ccf_section_subtotal_keywords.tsv')
+    mastersheet_filter_particulars : str = os.path.join(path.dirname(__file__),'keywords_library/mastersheet_filter_particulars.tsv')
 
 
 settings = Settings()

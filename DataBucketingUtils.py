@@ -4,6 +4,8 @@ from fuzzywuzzy import fuzz
 import re
 import nltk
 from typing import Dict
+import os
+import string
 
 
 def get_main_page_keywords(df_nlp_bucket_master,df_meta_keyword):
@@ -172,15 +174,16 @@ def get_notes_pages_line_items(transformed_standardised_note_df,keywords,obj_tec
             # if data_row['flg_processed']:
             #     continue
             list_target_keywords = keywords
+            
             for col in ["rows","columns"]:
                 txt_rows = strip_string_bullets(data_row[col],obj_techfuzzy)
-
+                # print(f"txt_rows : {txt_rows}")
                 if match_type == 'partial':
                     res_fuzz_match = obj_techfuzzy.partial_ratio_pro(txt_rows, list_target_keywords)
                 else:
                     res_fuzz_match = obj_techfuzzy.token_sort_pro(txt_rows, list_target_keywords)
                 # app.logger.debug(f'\t\t{res_fuzz_match}')
-
+                # print(f"res_fuzz_match : {res_fuzz_match}")
                 if res_fuzz_match[0][1] >= conf_score_thresh:
                     # if bucket_row['field_tag'] == 'multisum':
                     (best_match['value']).append(float(data_row["value"]))
@@ -203,6 +206,7 @@ def filter_notes_row_indices(included_keyword_best_match,excluded_keyword_best_m
 
 def get_notes_dfDict_after_filtering_keywords(note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict,obj_techfuzzy,conf_score,match_type='partial',notes_include_keywords=[],notes_exclude_keywords=[]):
     repsonse_notes_dict = {}
+    # print(f"notes_include_keywords : {notes_include_keywords}")
     # print(notes_include_keywords,notes_exclude_keywords)
     if "NULL" in notes_include_keywords:
         notes_include_keywords.remove("NULL")
@@ -215,6 +219,8 @@ def get_notes_dfDict_after_filtering_keywords(note_number_list,subnote_number_li
             # _df = filtered_transformed_standardised_tables_dict.get(tableid)
             if key == combo_key:
                 _df = value
+                # print(f"_df : {_df}")
+                
                 if len(notes_include_keywords)>0:
                     include_best_match = get_notes_pages_line_items(transformed_standardised_note_df=_df,keywords=notes_include_keywords,obj_techfuzzy=obj_techfuzzy,conf_score_thresh=conf_score,match_type=match_type)
                     if len(notes_exclude_keywords) > 0:
@@ -299,13 +305,12 @@ def get_matched_main_page_df(main_page_data_indices,df):
 
 def clean_note_df(std_horzntl_note_df):
     # patterns = ["consolidated","$000","$"]
-    patterns = ["consolidated","$000","$"]
+    patterns = ["consolidated","$000","$00","$"]
     for pattrn in patterns:
-        std_horzntl_note_df["line_item"] = std_horzntl_note_df["line_item"].str.replace(pattrn,'',flags=re.IGNORECASE)
-
+        std_horzntl_note_df["line_item"] = std_horzntl_note_df["line_item"].str.replace(re.escape(pattrn),'',flags=re.IGNORECASE)
+        # print(f"pattern: {pattrn}")
+        # print(std_horzntl_note_df["line_item"])
     return std_horzntl_note_df
-
-
 
 
 def remove_total_line_items(std_horzntl_note_df):
@@ -325,7 +330,7 @@ def remove_0_value_line_items(std_horzntl_note_df):
     for idx,row in std_horzntl_note_df.iterrows():
         sum = 0
         for year in year_cols:
-            sum = sum+year
+            sum = sum+row[year]
         if sum == 0:
             remove_indics.append(idx)
     if len(remove_indics)>0:
@@ -333,3 +338,80 @@ def remove_0_value_line_items(std_horzntl_note_df):
     std_horzntl_note_df.reset_index(drop=True,inplace=True)
 
     return std_horzntl_note_df
+
+
+def postprocessing_note_df(std_hrzntl_nte_df):
+    if len(std_hrzntl_nte_df) > 0:
+        std_hrzntl_nte_df = remove_0_value_line_items(std_horzntl_note_df=std_hrzntl_nte_df)
+        std_hrzntl_nte_df = remove_total_line_items(std_horzntl_note_df=std_hrzntl_nte_df)
+        std_hrzntl_nte_df = clean_note_df(std_horzntl_note_df=std_hrzntl_nte_df)
+    return std_hrzntl_nte_df
+
+
+def get_keywords_library(filepath):
+        res_dict = {}
+
+        if not os.path.exists(filepath):
+            return res_dict
+
+        df_book = pd.read_csv(filepath, sep='\t')
+        for key in df_book.key.unique():
+            res_dict[key] = []
+
+        for df_index, df_row in df_book.iterrows():
+            str_keyword = str(df_row['keyword']).strip()
+            res_dict[df_row['key']].append(str_keyword)
+            continue
+        return res_dict
+    
+def string_cleaning(str_line):
+        remove = string.punctuation
+        remove = remove + '\n'
+        pattern = r"[{}]".format(remove)  # create the pattern
+
+        # Regular expression to replace "Non - <TEXT>" to "Non-<TEXT>"
+        particular_text = re.sub(r'(non)(\s+)(-)(\s+)', r'\1\3', str(str_line), flags=re.IGNORECASE)
+
+        return re.sub(pattern, "", particular_text.strip())
+
+
+def remove_total_lines_main_pages(df_datasheet,filepath,statement_type,obj_techfuzzy):
+        remove_particulars = get_keywords_library(filepath)
+        remove_particulars = remove_particulars[statement_type]
+
+        remove_index = []
+        for df_index, df_row in df_datasheet.iterrows():
+            particular_text = string_cleaning(df_row['Particulars'])
+
+            if statement_type == 'ccf':
+                res_match = obj_techfuzzy.token_set_pro(particular_text, remove_particulars)
+            else:
+                res_match = obj_techfuzzy.token_sort_pro(particular_text, remove_particulars)
+
+            if res_match[0][1] >= 90:
+                remove_index.append(df_index)
+
+
+        df_datasheet = df_datasheet.drop(remove_index)
+
+        # app.logger.debug(f'AFTER PARTICULAR KEYWORDS FILTER | {self.statement_type} | \n {self.df_pdfdata}')
+
+        return df_datasheet
+
+
+### sepecific utility fucntion for particular line items in particular statement type
+
+def second_filter_PPE(std_hrzntl_note_df,month):
+    ## this function will filter PPE note further for month of given annual statemnt
+    month_indices = []
+    for idx,row in std_hrzntl_note_df.iterrows():
+        if month in row["line_item"].lower():
+            month_indices.append(idx)
+    # print(month_indices)
+    if len(month_indices)>0:
+        std_hrzntl_note_df = std_hrzntl_note_df.iloc[month_indices]
+    std_hrzntl_note_df.reset_index(drop=True,inplace=False)
+    return std_hrzntl_note_df
+
+
+    

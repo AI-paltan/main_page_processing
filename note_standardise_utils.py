@@ -253,10 +253,18 @@ def find_date_location(df):
     extracted_year_org.extend(extracted_year)
     # if not first_col_date_flag:
     row_date_flag,regex_year_found,columns_number,row_numbers,raw_text,extracted_year = is_next_data_col(df,first_col_date_flag,row_numbers)
-    columns_number_org.extend(columns_number)
-    row_numbers_org.extend(row_numbers)
-    raw_text_org.extend(raw_text)
-    extracted_year_org.extend(extracted_year)
+    ## if else statement to fix PPE issue of note 10 21 YML
+    if len(df.columns) > 2:
+        if len(columns_number)>1:
+            columns_number_org.extend(columns_number)
+            row_numbers_org.extend(row_numbers)
+            raw_text_org.extend(raw_text)
+            extracted_year_org.extend(extracted_year)
+    else:
+        columns_number_org.extend(columns_number)
+        row_numbers_org.extend(row_numbers)
+        raw_text_org.extend(raw_text)
+        extracted_year_org.extend(extracted_year)
 
     return columns_number_org,row_numbers_org,raw_text_org,extracted_year_org
         

@@ -49,9 +49,12 @@ class mainPageProcess:
         self.standardised_cropped_dict : Dict = {}
         self.standard_note_meta_dict = {}
         self.transformed_standardised_cropped_dict : Dict = {}
+        self.month : str
 
     def process_main_pages(self,fileid:str):
         self.fileid=fileid
+        file_query = db.query(db_models.FileLogs).filter(db_models.FileLogs.fileid == self.fileid).first()
+        self.month = file_query.month
         self.get_standardize_main_pages()
         self.merge_df() # if any statement spans over 2 pages
         self.notes_number_processing_cls()
