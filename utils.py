@@ -61,10 +61,11 @@ def get_years_and_positions_with_notes(df,notes_indices):
                     # except:
                     #     year = get_regex_year(str(item))
                     year = get_regex_year(str(item))
-                    if int(year) > 0:
-                        year_list.append(int(year))
-                        year_indices.append([idx,col_idx])
-                        raw_year_text.append(item)
+                    if year:  #to avoid Nonetype issue
+                        if int(year) > 0:
+                            year_list.append(int(year))
+                            year_indices.append([idx,col_idx])
+                            raw_year_text.append(item)
         if len(year_list) == (len(df.columns) - note_y-1):
             break
     return year_list,year_indices,raw_year_text
@@ -103,10 +104,11 @@ def get_years_and_positions_without_notes(df):
                 # except:
                 #     year = get_regex_year(str(item))
                 year = get_regex_year(str(item))
-                if year and int(year) > 0:
-                    year_list.append(int(year))
-                    year_indices.append([idx,col_idx])
-                    raw_year_text.append(item)
+                if year:  #to avoid Nonetype issue
+                    if year and int(year) > 0:
+                        year_list.append(int(year))
+                        year_indices.append([idx,col_idx])
+                        raw_year_text.append(item)
         if len(year_list) == 2:
             break
     return year_list,year_indices,raw_year_text
@@ -182,19 +184,22 @@ def split_numbers(number,threshold=60):
 def find_note_subnote_number(number):
     note = ''
     subnote = ''
-    if bool(re.match(r'\d+.\d+',str(number))):
-        note = str(number).split('.')[0]
-        subnote = str(number).split('.')[1]
-    elif bool(re.match(r'\d+\(\w+\)',str(number))):
-            note = str(number).split('(')[0]
-            subnote = "(" + str(number).split('(')[1]
-    elif bool(re.match(r'\d+[A-Za-z]+',str(number))):
-            res = re.findall(r'[A-Za-z]+|\d+', str(number))
-            note = res[0]
-            subnote = res[1]
-    elif bool(re.match(r'\d+',str(number))):
-            note = number
-            subnote = ''
+    try:
+        if bool(re.match(r'\d+.\d+',str(number))):
+            note = str(number).split('.')[0]
+            subnote = str(number).split('.')[1]
+        elif bool(re.match(r'\d+\(\w+\)',str(number))):
+                note = str(number).split('(')[0]
+                subnote = "(" + str(number).split('(')[1]
+        elif bool(re.match(r'\d+[A-Za-z]+',str(number))):
+                res = re.findall(r'[A-Za-z]+|\d+', str(number))
+                note = res[0]
+                subnote = res[1]
+        elif bool(re.match(r'\d+',str(number))):
+                note = number
+                subnote = ''
+    except:
+        pass
     return note,subnote
 
 def get_note_pattern(note,subnote):

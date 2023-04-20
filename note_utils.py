@@ -15,7 +15,7 @@ def find_note_start_index(note_pattern,account_text,ocr_line_df_dict,max_main_pa
     page_number = []
     start_bbox = []
     for k,df in ocr_line_df_dict.items():
-        if k > max_main_page : ## alaways start after cash flow page
+        if k > max_main_page + 2: ## alaways start after cash flow page
             for idx,row in df.iterrows():
                 if note_end_testing(note_pattern,row['text'].lower()):
                     ratio = fuzz.partial_ratio(str(account_text).lower(), row['text'].lower())
@@ -82,7 +82,7 @@ def get_first_note_occurance(notes_pages,notes_bbox,max_main_page):   ## issue T
     notes_pages_int = []
     notes_bbox_int = []
     for pge,bbx in zip(notes_pages,notes_bbox):
-        if pge > max_main_page + 4:
+        if pge > max_main_page + 2:
             notes_pages_int.append(pge)
             notes_bbox_int.append(bbx)
     tmp_pge = notes_pages_int[0]

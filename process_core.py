@@ -106,7 +106,7 @@ class mainPageProcess:
     
     def merge_df(self):
         if len(self.cbs_df_dict) > 1 and len(set(self.cbs_df_dict.keys())) > 1 :
-            keys = list(self.cbs_df_dict.keys())
+            keys = sorted(list(self.cbs_df_dict.keys()))
             appended_df = []
             for k in keys:
                 appended_df.append(self.cbs_df_dict.get(k))
@@ -117,7 +117,7 @@ class mainPageProcess:
                 if k!= min_keys:
                     del self.cbs_df_dict[k]
         if len(self.cpl_df_dict) > 1 and len(set(self.cpl_df_dict.keys())) > 1 :
-            keys = list(self.cpl_df_dict.keys())
+            keys = sorted(list(self.cpl_df_dict.keys()))
             appended_df = []
             for k in keys:
                 appended_df.append(self.cpl_df_dict.get(k))
@@ -128,7 +128,7 @@ class mainPageProcess:
                 if k!= min_keys:
                     del self.cpl_df_dict[k]
         if len(self.ccf_df_dict) > 1 and len(set(self.ccf_df_dict.keys())) > 1 :
-            keys = list(self.ccf_df_dict.keys())
+            keys = sorted(list(self.ccf_df_dict.keys()))
             appended_df = []
             for k in keys:
                 appended_df.append(self.ccf_df_dict.get(k))
