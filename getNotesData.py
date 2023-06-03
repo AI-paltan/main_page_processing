@@ -110,7 +110,11 @@ class getNotesDataTables:
                 append_tableid_list = []
                 for table,row_number in zip(table_list,row_numbers):
                     if table.tableid not in processed_tables:
-                        table_df = pd.read_html(table.html_string)[0]
+                        # print(table.html_string)
+                        try:
+                            table_df = pd.read_html(table.html_string)[0]
+                        except:
+                            pass
                         unique_rows = list(np.array(list(set(row_number)))-1)
                         if len(unique_rows) > 1:
                             # cropped_df = table_df.iloc[unique_rows]

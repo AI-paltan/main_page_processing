@@ -49,6 +49,7 @@ class mainPageProcess:
         self.standardised_cropped_dict : Dict = {}
         self.standard_note_meta_dict = {}
         self.transformed_standardised_cropped_dict : Dict = {}
+        self.years_list : list = {}
         self.month : str
 
     def process_main_pages(self,fileid:str):
@@ -87,6 +88,7 @@ class mainPageProcess:
                 process_cbs,temp_df = RCB.start_refactoring()
                 self.cbs_df_dict[page.page_number] = process_cbs
                 self.meta_dict[page.page_number] = temp_df
+                self.years_list = temp_df["year_list"]
             if page.page_number  in self.filtered_cpl_pages:
                 tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
                 html_string = tabale_query.html_string
@@ -199,7 +201,7 @@ class mainPageProcess:
 
 
     def standardize_notes_data(self):
-        obj_noteStandardise = NoteStandardised(self.cropped_table_dict)
+        obj_noteStandardise = NoteStandardised(self.cropped_table_dict,notes_ref_dict=self.notes_ref_dict,year_list=self.years_list)
         obj_noteStandardise.trigger_job()
         self.standardised_cropped_dict = obj_noteStandardise.standard_note_df
         self.standard_note_meta_dict = obj_noteStandardise.standard_note_meta_dict

@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import numpy as np
 from datetime import date
+from collections import defaultdict
 
 
 
@@ -112,7 +113,7 @@ def find_date_location2(df):
     
 ## given df find date location in first column using pd.to_datetime
 ### else find in each row and get location of first row
-def find_date_location(df):
+def find_date_location(df,main_page_year_list):
     ## returns (col_index_list,row_index_list,year,raw_text)
     ## find if first column contains any date
     def get_regex_year(val):
@@ -131,7 +132,9 @@ def find_date_location(df):
                     year_val = '20'+str(value)
 #                     return str(year_val)
                 if (int(year_val) <= int(date.today().year) ) & (int(year_val)>=(int(date.today().year))-5):
-                    return str(year_val)
+                    if len(main_page_year_list)>0:
+                        if int(year_val) in main_page_year_list:
+                            return str(year_val)
                 else:
                     return str(-1)
         else:
@@ -546,6 +549,7 @@ def set_year_column_for_final_df2(fin_df,date_coordinates,header_indices,raw_yea
         col_subscript = -1
         row_indices = []
         fin_df['year'] = None
+        year_column_header_name = ''
         header_indices = sorted(header_indices,reverse=True)
         for column,rows in zip(date_coordinates[0],date_coordinates[1]):
                 if column > 0:
@@ -671,28 +675,118 @@ def set_totalKeyword_line_items(nte_df,particulars_endcol_coordinates,particular
 
 
 
-def find_date_loc_super(df,main_page_notes_ref_dict,key):
+class NestedDefaultDict(defaultdict):
+    def __init__(self, *args, **kwargs):
+        super(NestedDefaultDict, self).__init__(NestedDefaultDict, *args, **kwargs)
+
+    def __repr__(self):
+        return repr(dict(self))
+    
+def find_date_loc_super(df,main_page_notes_ref_dict,key,prev_column_number,prev_row_number):
     ## this function will try to find the date location for pdf in which years appears at top of page and not for individual notes
     ## key is comibnation of  note_tableid
+    # print(df)
     def clean_number(number):
         number = str(number).replace(r',',"")
         number = str(number).replace(r')',"")
         number = str(number).replace(r'(',"-")
         return number
     df_copy = df.copy()
-    df_copy = df_copy.apply(clean_number).apply(pd.to_numeric , errors='coerce').fillna(0)
+    # print(df_copy)
+    # df_copy = df_copy.apply(clean_number)#.apply(pd.to_numeric , errors='coerce').fillna(0)
+    # print(df_copy)
+    # print(df_copy.apply(clean_number))
     columns_number_org = []
     row_numbers_org = []
     raw_text_org = []
     extracted_year_org = []
     note_no = str(key).split("_")[0]
+    index_dict =  NestedDefaultDict()
     for main_page_statement_type,ref_list in main_page_notes_ref_dict.items():
         for note_ref_items in ref_list:
-            if note_ref_items["main_note_number"] == note_no:
-                main_page_year_values = note_ref_items["year_values"] 
+            for nte_no in note_ref_items["main_note_number"]:
+                if nte_no == note_no:
+                    main_page_year_values = note_ref_items["year_values"] 
+                    print(f"main_page_year_values: {main_page_year_values}")
+                    index_dict = get_year_value_match_row_indices(main_page_year_values,df_copy,index_dict=index_dict)
+                    print(f"df = {df_copy}")
+                    print(f"index dict = {index_dict}")
+                    # years_list = list(main_page_year_values.keys())
+                    # for year in years_list:
+                    #     year_value = main_page_year_values.get(year)
+                        
+    # final_col_number,final_row_number,mod_df = cross_checking_with_pev_date_fun_result()
+
+def cross_checking_with_pev_date_fun_result(prev_column_number,prev_row_number,index_dict,df_copy):
+    if len(prev_column_number) <= 0:
+        pass
+    ## first check unique values of idex dct column number ;
+    ## if more than 1 then set it as column number and add row at 0th location in df 
+    ## and put higher year value at low column and lower value at higher column.
+    ## if only 1 column number found then check for unique row number and concat year value text with particluar text
+    else:
+        validate()
+    ## check if prev column and found column list are similar or not 
+    ## if similar then keep it as it is and dont change anything
+    ## if not follow above process
 
 
+def get_year_value_match_row_indices(year_dict,number_converted_df,index_dict):
+    def clean_number(number):
+        number = str(number).replace(r',',"")
+        number = str(number).replace(r')',"")
+        number = str(number).replace(r'(',"-")
+        return number
+    years_list = list(year_dict.keys())
+    # index_dict = {}
+    
+    
+    for year in years_list:
+        col_idx = []
+        row_idx = []
+        inside_dict = {}
+        year_value = year_dict.get(year)
+        # print(year_value)
+        # for colidx,series in number_converted_df.items():
+        for colidx,column in enumerate(number_converted_df):
+            series = number_converted_df[column]
+            # print(colidx)
+            # print(series)
+            for idx,value in enumerate(series):
+                value = clean_number(str(value))
+                if str(value).isdigit():
+                    if float(value) == float(year_value):
+                        row_idx.append(idx)
+                        col_idx.append(colidx)
+                        # print(row_idx)
+                        # print(col_idx)
+        inside_dict['row_indices'] = row_idx
+        inside_dict['col_indices'] = col_idx
+        # index_dict[year] = inside_dict
+        if year in index_dict:
+            index_dict[year]['row_indices'].extend(row_idx)
+            index_dict[year]['col_indices'].extend(col_idx)
+            print("inside")
+        else:
+            index_dict[year] = inside_dict
+        # print(index_dict)
+        # print(f"df = {number_converted_df}")
+        
+        # for colidx,series in number_converted_df.items():
+        #     i = series.index
+        #     indx = float(number_converted_df) == float(year_value)
+        #     result = i[indx]
+        #     index_dict[year] = result.tolist()
+    return index_dict
 
+def validating_row_or_column(index_dict):
+    years_list = list(index_dict.keys())
+    both_year_value_prsnt = True
+    both_year_same_length = False
+    for year in years_list:
+        if len(index_dict.get(year)) == 0 :
+            both_year_value_prsnt = False
 
+    if both_year_value_prsnt:
+        pass
 
-                

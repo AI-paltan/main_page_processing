@@ -4,8 +4,10 @@ from typing import Dict
 
 
 class NoteStandardised:
-    def __init__(self,cropped_table_dict) -> None:
+    def __init__(self,cropped_table_dict,notes_ref_dict,year_list) -> None:
         self.cropped_table_dict = cropped_table_dict
+        self.main_page_notes_ref_dict = notes_ref_dict
+        self.years_list  = year_list
         self.standard_note_df : Dict = {}
         self.standard_note_meta_dict = {}
         self.transformed_standardised_cropped_dict = {}
@@ -34,10 +36,11 @@ class NoteStandardised:
                 meta_dict : Dict = {}
                 final_transformed_df = pd.DataFrame()
                 print(f"key :{key}")
+                # print(f"year list : {self.years_list}")
                 try:
                     note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
-                    columns_number,row_number,raw_text,extracted_year = find_date_location(note_df)
-                    
+                    columns_number,row_number,raw_text,extracted_year = find_date_location(note_df,self.years_list)
+                    find_date_loc_super(df=note_df,main_page_notes_ref_dict=self.main_page_notes_ref_dict,key=key,prev_column_number=columns_number,prev_row_number=row_number)
                     print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
                     data_row_coords,particular_end_col,particular_start_row = find_data_block_location(note_df=note_df.copy(),date_block_coordinates=(columns_number,row_number))
                     print(f"data_row_coords: {data_row_coords} , particular_end_col: {particular_end_col} ,particular_start_row: {particular_start_row} ")
@@ -56,7 +59,7 @@ class NoteStandardised:
                     # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
                     final_df,year_column_header_name = set_year_column_for_final_df2(fin_df,(columns_number,row_number),header_indices,raw_text,extracted_year)
                     # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
-                    print(final_df)
+                    # print(final_df)
                     final_df = numbers_processing(final_df)
                     final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
                     meta_dict["date_column_number"] = columns_number
