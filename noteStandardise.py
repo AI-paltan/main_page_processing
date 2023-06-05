@@ -57,7 +57,9 @@ class NoteStandardised:
                     # print(fin_df)
                     # print(header_indices)
                     # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
+                    # try:
                     final_df,year_column_header_name = set_year_column_for_final_df2(fin_df,(columns_number,row_number),header_indices,raw_text,extracted_year)
+                
                     # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
                     # print(final_df)
                     final_df = numbers_processing(final_df)
@@ -79,6 +81,7 @@ class NoteStandardised:
                     meta_dict["header_indices"] = header_indices
                     meta_dict["header_indices"] = header_indices
                     meta_dict["year_column_header_name"] = year_column_header_name
+                    
                 except Exception as e:
                     print(e)
                 self.standard_note_df[key] = final_df

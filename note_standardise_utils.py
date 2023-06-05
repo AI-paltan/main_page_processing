@@ -135,6 +135,10 @@ def find_date_location(df,main_page_year_list):
                     if len(main_page_year_list)>0:
                         if int(year_val) in main_page_year_list:
                             return str(year_val)
+                        else:
+                            return str(-1)
+                    else:
+                        return str(-1)
                 else:
                     return str(-1)
         else:
@@ -150,15 +154,19 @@ def find_date_location(df,main_page_year_list):
         date_present_rows_indices_for_col0 = []
         first_col_date_flag = df.iloc[:,0].transform(pd.to_datetime,errors='coerce').notnull().any()
         if first_col_date_flag:
-            columns_number.append(0)
+            # columns_number.append(0)
             date_present_rows_indices_for_col0 = sorted(df.iloc[:,0][df.iloc[:,0].transform(pd.to_datetime,errors='coerce').notnull()].index.to_list())
-            row_numbers.append(date_present_rows_indices_for_col0)
+            # row_numbers.append(date_present_rows_indices_for_col0)
             if getSizeOfNestedList(row_numbers) > 1:
                 raw_text_lst = df.iloc[:,0][df.iloc[:,0].transform(pd.to_datetime,errors='coerce').notnull()].to_list()
                 extracted_year_lst = df.iloc[:,0][df.iloc[:,0].transform(pd.to_datetime,errors='coerce').notnull()].transform(pd.to_datetime,errors='coerce').dt.year.to_list()
-                raw_text.append(raw_text_lst)
-                extracted_year.append(extracted_year_lst)
-                first_col_date_flag = True
+                for raw_text_year,extract_year in zip(raw_text_lst,extracted_year_lst):
+                    if int(extract_year) in main_page_year_list:
+                        columns_number.append(0)
+                        row_numbers.append(date_present_rows_indices_for_col0)
+                        raw_text.append(raw_text_year)
+                        extracted_year.append(extract_year)
+                        first_col_date_flag = True
             else:
                 first_col_date_flag =False
         else:
@@ -730,6 +738,9 @@ def cross_checking_with_pev_date_fun_result(prev_column_number,prev_row_number,i
     ## if similar then keep it as it is and dont change anything
     ## if not follow above process
 
+
+def get_super_col_row_df():
+    pass
 
 def get_year_value_match_row_indices(year_dict,number_converted_df,index_dict):
     def clean_number(number):
