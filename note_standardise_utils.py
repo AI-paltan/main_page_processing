@@ -225,10 +225,13 @@ def find_date_location(df,main_page_year_list):
                     extracted_year_lst = df.iloc[idx][df.iloc[idx].transform(pd.to_datetime,errors='coerce').notnull()].transform(pd.to_datetime,errors='coerce').dt.year.to_list()
                     for col,raw_year,extract_year in zip(date_present_column_indices_for_row,raw_text_lst,extracted_year_lst):
                         if (int(extract_year) <= int(date.today().year) ) & (int(extract_year)>=(int(date.today().year))-5):
+                            # if int(extract_year) in main_page_year_list:
                             columns_number.append(col)
                             row_numbers.append([idx])
                             raw_text.append([raw_year])
                             extracted_year.append([extract_year])
+                            # else:
+                            #     row_date_flag = False
                         else:
                             row_date_flag = False
                     if row_date_flag:
@@ -666,8 +669,8 @@ def numbers_processing(df):
         number = str(number).replace(r')',"")
         number = str(number).replace(r'(',"-")
         return number
-
-    df["value"] = df["value"].apply(clean_number).apply(pd.to_numeric , errors='coerce').fillna(0)
+    if "value" in df.columns:
+        df["value"] = df["value"].apply(clean_number).apply(pd.to_numeric , errors='coerce').fillna(0)
 #     for idx,row in df.iterrows()
     return df
 
@@ -682,7 +685,7 @@ def set_totalKeyword_line_items(nte_df,particulars_endcol_coordinates,particular
     return blankrows,nte_df
 
 
-
+### super date location finder using data
 class NestedDefaultDict(defaultdict):
     def __init__(self, *args, **kwargs):
         super(NestedDefaultDict, self).__init__(NestedDefaultDict, *args, **kwargs)
@@ -690,7 +693,7 @@ class NestedDefaultDict(defaultdict):
     def __repr__(self):
         return repr(dict(self))
     
-def find_date_loc_super(df,main_page_notes_ref_dict,key,prev_column_number,prev_row_number):
+def find_date_loc_super(df,main_page_notes_ref_dict,key,prev_column_number,prev_row_number,year_list):
     ## this function will try to find the date location for pdf in which years appears at top of page and not for individual notes
     ## key is comibnation of  note_tableid
     # print(df)
@@ -723,24 +726,121 @@ def find_date_loc_super(df,main_page_notes_ref_dict,key,prev_column_number,prev_
                     # for year in years_list:
                     #     year_value = main_page_year_values.get(year)
                         
-    # final_col_number,final_row_number,mod_df = cross_checking_with_pev_date_fun_result()
+    final_df,final_col_number,final_row_number,final_raw_text,final_extrated_year = cross_checking_with_pev_date_fun_result(prev_column_number=prev_column_number,prev_row_number=prev_row_number,index_dict=index_dict,df_copy=df_copy,main_page_year_values=year_list)
+    return final_df,final_col_number,final_row_number,final_raw_text,final_extrated_year
 
-def cross_checking_with_pev_date_fun_result(prev_column_number,prev_row_number,index_dict,df_copy):
+
+def cross_checking_with_pev_date_fun_result(prev_column_number,prev_row_number,index_dict,df_copy,main_page_year_values):
+    mod_df = df_copy
+    row_number = [[-1]]
+    raw_text = [[-1]]
+    extracted_year = [[-1]]
+    column_numbr = [-1]
     if len(prev_column_number) <= 0:
-        pass
+        mod_df,column_numbr,row_number,raw_text,extracted_year = get_super_col_row_df(df=df_copy,index_dict=index_dict,main_page_year_lst=main_page_year_values)
     ## first check unique values of idex dct column number ;
     ## if more than 1 then set it as column number and add row at 0th location in df 
     ## and put higher year value at low column and lower value at higher column.
     ## if only 1 column number found then check for unique row number and concat year value text with particluar text
     else:
-        validate()
+        mod_df,column_numbr,row_number,raw_text,extracted_year = validate_with_previous_result(prev_col_number=prev_column_number,index_dict=index_dict,df=df_copy,main_page_year_lst=main_page_year_values)
     ## check if prev column and found column list are similar or not 
     ## if similar then keep it as it is and dont change anything
     ## if not follow above process
+    return mod_df,column_numbr,row_number,raw_text,extracted_year
 
 
-def get_super_col_row_df():
-    pass
+
+def validate_with_previous_result(prev_col_number,index_dict,df,main_page_year_lst):
+    col_lst_unique = get_col_lst(index_dict)
+    inter_sect = set(prev_col_number).intersection(set(col_lst_unique))
+    if len(inter_sect) > 0:
+        column_numbr = prev_col_number
+        row_number = [[-1]]
+        raw_text = [[-1]]
+        extracted_year = [[-1]]
+        return df,column_numbr,row_number,raw_text,extracted_year
+    else:
+        df,column_numbr,row_number,raw_text,extracted_year = get_super_col_row_df(df=df,index_dict=index_dict,main_page_year_lst=main_page_year_lst)
+        return df,column_numbr,row_number,raw_text,extracted_year
+
+
+def get_super_col_row_df(df,index_dict,main_page_year_lst):
+    mod_df = df
+    row_number = [[-1]]
+    raw_text = [[-1]]
+    extracted_year = [[-1]]
+    column_numbr = [-1]
+    col_lst_unique = get_col_lst(index_dict)
+    if len(col_lst_unique) > 1:
+        mod_df,column_numbr,row_number,raw_text,extracted_year = add_column_row_in_df(year_list=main_page_year_lst,col_list=col_lst_unique,df=df)
+    elif len(col_lst_unique)==1:
+        mod_df,column_numbr,row_number,raw_text,extracted_year = add_year_value_in_particular_row_df(df=df,index_dict=dict,col_lst_unique=col_lst_unique)
+    return mod_df,column_numbr,row_number,raw_text,extracted_year
+
+
+def add_column_row_in_df(year_list,col_list,df):
+    col_list = sorted(col_list)
+    year_list = sorted(year_list,reverse=True)
+    row_add_lst = [None] * len(df.columns)
+    row_add = np.array(row_add_lst)
+    row_add[:] = np.nan
+    # row_add = [] 
+    print(row_add)
+    raw_text = []
+    extracted_year = []
+    column_numbr = []
+    row_number = []
+    for index,year in zip(col_list,year_list):
+        # row_add.insert(index, str(year))
+        row_add[index] = str(year)
+        raw_text.append([str(year)])
+        extracted_year.append([int(year)])
+        column_numbr.append(index)
+        row_number.append([0])
+    # print(row_add)
+    df.loc[-1] = row_add
+    df.index = df.index + 1  # shifting index
+    df = df.sort_index() 
+    return df,column_numbr,row_number,raw_text,extracted_year
+
+
+def add_year_value_in_particular_row_df(df,index_dict,col_lst_unique):
+    processed_rows = []
+    raw_text = []
+    extracted_year = []
+    column_numbr = []
+    row_number = []
+    for year in index_dict.keys():
+        row_indices = index_dict[year]["row_indices"]
+        # col_indices = list(set(index_dict[year]["col_indices"]))
+        for row_idx in row_indices:
+            if row_idx not in processed_rows:
+                if (col_lst_unique -1) >=0:
+                    df.at[row_idx,col_lst_unique-1] = str(year) + str(df.iloc[row_idx,col_lst_unique-1])
+                    processed_rows.append(row_idx)
+                    raw_text.append([str(year) + str(df.iloc[row_idx,col_lst_unique-1])])
+                    extracted_year.append([int(year)])
+                    column_numbr.append(col_lst_unique-1)
+                    row_number.append([row_idx])
+    return df,column_numbr,row_number,raw_text,extracted_year
+
+
+def get_col_lst(index_dict):
+    col_list = []
+    col_list_unique = []
+    for year in index_dict.keys():
+        col_list.extend(index_dict[year]["col_indices"])
+    
+    col_list_unique= sorted(list(set(col_list)))
+    return col_list_unique
+
+def find_year_from_index_dict_using_colnumber(index_dct,col_number):
+    for year in index_dct.keys():
+        if int(col_number) in index_dct[year]["col_indices"]:
+            return year
+        else:
+            return -1
 
 def get_year_value_match_row_indices(year_dict,number_converted_df,index_dict):
     def clean_number(number):

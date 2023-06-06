@@ -40,7 +40,23 @@ class NoteStandardised:
                 try:
                     note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
                     columns_number,row_number,raw_text,extracted_year = find_date_location(note_df,self.years_list)
-                    find_date_loc_super(df=note_df,main_page_notes_ref_dict=self.main_page_notes_ref_dict,key=key,prev_column_number=columns_number,prev_row_number=row_number)
+                    print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
+                    mod_df,column_numbr_s,row_number_s,raw_text_s,extracted_year_s = find_date_loc_super(df=note_df,main_page_notes_ref_dict=self.main_page_notes_ref_dict,key=key,prev_column_number=columns_number,prev_row_number=row_number,year_list=self.years_list)
+                    print(f"mod_df: {mod_df}")
+                    print(f"column_numbr_s = {column_numbr_s}, row_number_s = {row_number_s}, raw_text_s = {raw_text_s} , extracted_year_s = {extracted_year_s}")
+                    if len(raw_text_s) > 0:
+                        if raw_text_s[0][0] == -1:
+                            columns_number = columns_number
+                            row_number = row_number
+                            raw_text = raw_text
+                            extracted_year = extracted_year
+                            note_df = note_df
+                        else:
+                            columns_number = column_numbr_s
+                            row_number = row_number_s
+                            raw_text = raw_text_s
+                            extracted_year = extracted_year_s
+                            note_df  = mod_df
                     print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
                     data_row_coords,particular_end_col,particular_start_row = find_data_block_location(note_df=note_df.copy(),date_block_coordinates=(columns_number,row_number))
                     print(f"data_row_coords: {data_row_coords} , particular_end_col: {particular_end_col} ,particular_start_row: {particular_start_row} ")
