@@ -295,3 +295,13 @@ def check_and_remove_duplicate_column(nte_df):
         if ratio_duplicate > 90:
             nte_df = nte_df.drop(nte_df.columns[1], axis=1).T.reset_index(drop=True).T
     return nte_df
+
+def main_page_table_preprocessing():
+    pass
+#remove duplicate columns using generic function taking inspiration from above function
+#sort table using bbox
+#if more than 1 table try to merge using columns starting from last
+#if merge failes pick top table
+
+
+

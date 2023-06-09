@@ -186,7 +186,8 @@ class mainPageProcess:
         self.add_raw_note_to_notes_meta_data()
 
     def remove_empty_rows_from_notes_meta_data(self):
-        self.notes_region_meta_data = self.notes_region_meta_data[self.notes_region_meta_data['start_page'].str.len()>0].reset_index(drop=True)
+        if len(self.notes_region_meta_data) > 0:
+            self.notes_region_meta_data = self.notes_region_meta_data[self.notes_region_meta_data['start_page'].str.len()>0].reset_index(drop=True)
 
     def add_raw_note_to_notes_meta_data(self):
         self.notes_region_meta_data['raw_note_number'] = [[] for _ in range(len(self.notes_region_meta_data))]
