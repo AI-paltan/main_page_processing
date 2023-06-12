@@ -298,10 +298,40 @@ def check_and_remove_duplicate_column(nte_df):
 
 def main_page_table_preprocessing():
     pass
-#remove duplicate columns using generic function taking inspiration from above function
+#remove duplicate columns using generic function taking inspiration from above function : for time being use above function only until new code is born
+
 #sort table using bbox
 #if more than 1 table try to merge using columns starting from last
 #if merge failes pick top table
+
+
+
+def table_sorting(table_df):
+    sorted_df = table_df.sort_values(by='top',ignore_index=True)
+    return sorted_df
+
+def generic_check_and_remove_duplicate_column(table_df):
+    cnt = 0
+    row_duplicate = 0
+    ratio_duplicate = 0
+    
+
+
+def merge_columnwise_tables(table_df_list):
+    ### if column matched then merge columnwise as it it else 
+    ## iterate over column and merge from last
+    merged_table_df = []
+    for table in table_df_list:
+        if len(merged_table_df.columns) == len(table.columns):
+            merged_table_df.append(table)
+            merged_table_df = pd.concat(merged_table_df)
+        else:
+            ##check column length for tables (merged_table_df and next table from list)
+            ##
+            for col1,col2 in zip():
+                pass
+
+    
 
 
 
