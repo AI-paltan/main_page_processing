@@ -81,9 +81,12 @@ class mainPageProcess:
         self.max_main_page = max(self.all_filtered_pages)
         for page in pages:
             if page.page_number  in self.filtered_cbs_pages:
-                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
-                html_string = tabale_query.html_string
-                tmp_df = pd.read_html(html_string)[0]
+                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc())
+                table_df = pd.read_sql(tabale_query.statement, tabale_query.session.bind)
+                main_page_table_preprocessing(table_df)
+                # tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
+                # html_string = tabale_query.html_string
+                # tmp_df = pd.read_html(html_string)[0]
                 RCB = RefactorCBS(df=tmp_df)
                 process_cbs,temp_df = RCB.start_refactoring()
                 self.cbs_df_dict[page.page_number] = process_cbs

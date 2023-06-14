@@ -296,8 +296,9 @@ def check_and_remove_duplicate_column(nte_df):
             nte_df = nte_df.drop(nte_df.columns[1], axis=1).T.reset_index(drop=True).T
     return nte_df
 
-def main_page_table_preprocessing():
-    pass
+def main_page_table_preprocessing(table_query):
+    for table in table_query:
+        pass
 #remove duplicate columns using generic function taking inspiration from above function : for time being use above function only until new code is born
 
 #sort table using bbox
@@ -327,9 +328,9 @@ def merge_columnwise_tables(table_df_list):
             merged_table_df = pd.concat(merged_table_df)
         else:
             ##check column length for tables (merged_table_df and next table from list)
-            ##
-            for col1,col2 in zip():
-                pass
+            ##table having more columns will get appended from data   
+            # for col1,col2 in zip():
+            pass
 
     
 
