@@ -81,9 +81,12 @@ class mainPageProcess:
         self.max_main_page = max(self.all_filtered_pages)
         for page in pages:
             if page.page_number  in self.filtered_cbs_pages:
-                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
-                html_string = tabale_query.html_string
-                tmp_df = pd.read_html(html_string)[0]
+                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc())
+                table_df = pd.read_sql(tabale_query.statement, tabale_query.session.bind)
+                main_page_table_preprocessing(table_df)
+                # tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
+                # html_string = tabale_query.html_string
+                # tmp_df = pd.read_html(html_string)[0]
                 RCB = RefactorCBS(df=tmp_df)
                 process_cbs,temp_df = RCB.start_refactoring()
                 self.cbs_df_dict[page.page_number] = process_cbs
@@ -186,7 +189,8 @@ class mainPageProcess:
         self.add_raw_note_to_notes_meta_data()
 
     def remove_empty_rows_from_notes_meta_data(self):
-        self.notes_region_meta_data = self.notes_region_meta_data[self.notes_region_meta_data['start_page'].str.len()>0].reset_index(drop=True)
+        if len(self.notes_region_meta_data) > 0:
+            self.notes_region_meta_data = self.notes_region_meta_data[self.notes_region_meta_data['start_page'].str.len()>0].reset_index(drop=True)
 
     def add_raw_note_to_notes_meta_data(self):
         self.notes_region_meta_data['raw_note_number'] = [[] for _ in range(len(self.notes_region_meta_data))]
