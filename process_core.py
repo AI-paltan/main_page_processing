@@ -81,9 +81,10 @@ class mainPageProcess:
         self.max_main_page = max(self.all_filtered_pages)
         for page in pages:
             if page.page_number  in self.filtered_cbs_pages:
+                # print("CBS")
                 tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc())
                 table_df = pd.read_sql(tabale_query.statement, tabale_query.session.bind)
-                main_page_table_preprocessing(table_df)
+                tmp_df = main_page_table_preprocessing(table_df)
                 # tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
                 # html_string = tabale_query.html_string
                 # tmp_df = pd.read_html(html_string)[0]
@@ -93,17 +94,27 @@ class mainPageProcess:
                 self.meta_dict[page.page_number] = temp_df
                 self.years_list = temp_df["year_list"]
             if page.page_number  in self.filtered_cpl_pages:
-                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
-                html_string = tabale_query.html_string
-                tmp_df = pd.read_html(html_string)[0]
+                # print("CPL")
+                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc())
+                table_df = pd.read_sql(tabale_query.statement, tabale_query.session.bind)
+                tmp_df = main_page_table_preprocessing(table_df)
+                # tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
+                # html_string = tabale_query.html_string
+                # tmp_df = pd.read_html(html_string)[0]
+                # print(f"tmp_df = {tmp_df}")
                 RCB = RefactorCBS(df=tmp_df)
                 process_cpl,temp_df = RCB.start_refactoring()
                 self.cpl_df_dict[page.page_number] = process_cpl
                 self.meta_dict[page.page_number] = temp_df
             if page.page_number  in self.filtered_ccf_pages:
-                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
-                html_string = tabale_query.html_string
-                tmp_df = pd.read_html(html_string)[0]
+                # print("CCF")
+                tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc())
+                table_df = pd.read_sql(tabale_query.statement, tabale_query.session.bind)
+                tmp_df = main_page_table_preprocessing(table_df)
+                # tabale_query = db.query(db_models.TableLogs).filter(db_models.TableLogs.pageid == page.pageid).order_by(db_models.TableLogs.time.desc()).first()
+                # html_string = tabale_query.html_string
+                # tmp_df = pd.read_html(html_string)[0]
+                
                 RCB = RefactorCBS(df=tmp_df)
                 process_ccf,temp_df = RCB.start_refactoring()
                 self.ccf_df_dict[page.page_number] = process_ccf

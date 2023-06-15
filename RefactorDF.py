@@ -22,6 +22,8 @@ class RefactorCBS:
             col_num = self.find_template()
             if col_num == 4:
                 standard_df, temp_df = self.ideal_format_processing()
+        # print(f"start_refactoring = {standard_df}")
+        # print(f"start_refactoring = {temp_df}")
         return standard_df, temp_df
 
         
@@ -56,6 +58,7 @@ class RefactorCBS:
         temp_df["particulars_y"] = particulars_y
         temp_df["headers"] = headers
         temp_df["total_columns"] = 4
+        # print(f"ideal_format_temp_df = {temp_df}")
         return standard_df, temp_df
 
     def non_ideal_format_without_notes_processing(self):

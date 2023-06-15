@@ -184,22 +184,22 @@ def split_numbers(number,threshold=60):
 def find_note_subnote_number(number):
     note = ''
     subnote = ''
-    try:
-        if bool(re.match(r'\d+.\d+',str(number))):
-            note = str(number).split('.')[0]
-            subnote = str(number).split('.')[1]
-        elif bool(re.match(r'\d+\(\w+\)',str(number))):
-                note = str(number).split('(')[0]
-                subnote = "(" + str(number).split('(')[1]
-        elif bool(re.match(r'\d+[A-Za-z]+',str(number))):
-                res = re.findall(r'[A-Za-z]+|\d+', str(number))
-                note = res[0]
-                subnote = res[1]
-        elif bool(re.match(r'\d+',str(number))):
-                note = number
-                subnote = ''
-    except:
-        pass
+    # try:
+    if bool(re.match(r'\d+.\d+',str(number))):
+        note = str(number).split('.')[0]
+        subnote = str(number).split('.')[1]
+    elif bool(re.match(r'\d+\(\w+\)',str(number))):
+            note = str(number).split('(')[0]
+            subnote = "(" + str(number).split('(')[1]
+    elif bool(re.match(r'\d+[A-Za-z]+',str(number))):
+            res = re.findall(r'[A-Za-z]+|\d+', str(number))
+            note = res[0]
+            subnote = res[1]
+    elif bool(re.match(r'\d+',str(number))):
+            note = number
+            subnote = ''
+    # except:
+    #     pass
     return note,subnote
 
 def get_note_pattern(note,subnote):
@@ -296,9 +296,24 @@ def check_and_remove_duplicate_column(nte_df):
             nte_df = nte_df.drop(nte_df.columns[1], axis=1).T.reset_index(drop=True).T
     return nte_df
 
-def main_page_table_preprocessing(table_query):
-    for table in table_query:
-        pass
+
+def main_page_table_preprocessing(table_df):
+    if len(table_df) > 0:
+        sorted_table_df = table_sorting(table_df)
+        cleaned_table_list = []
+        for idx,value in sorted_table_df.iterrows():
+            tb_df = pd.read_html(value.html_string)[0]
+            clean_tb_df  = check_and_remove_duplicate_column(nte_df=tb_df)
+            cleaned_table_list.append(clean_tb_df)
+        # print(cleaned_table_list)
+        merged_table_df = merge_columnwise_tables(table_df_list=cleaned_table_list)
+
+        return merged_table_df
+    else:
+        return table_df
+
+       
+
 #remove duplicate columns using generic function taking inspiration from above function : for time being use above function only until new code is born
 
 #sort table using bbox
@@ -322,15 +337,19 @@ def merge_columnwise_tables(table_df_list):
     ### if column matched then merge columnwise as it it else 
     ## iterate over column and merge from last
     merged_table_df = []
-    for table in table_df_list:
-        if len(merged_table_df.columns) == len(table.columns):
-            merged_table_df.append(table)
-            merged_table_df = pd.concat(merged_table_df)
-        else:
-            ##check column length for tables (merged_table_df and next table from list)
-            ##table having more columns will get appended from data   
-            # for col1,col2 in zip():
-            pass
+    merged_table_df = [table_df_list[0]]
+    if len(table_df_list)>1:
+        for table in table_df_list[1:]:
+            if len(merged_table_df[0].columns) == len(table.columns):
+                merged_table_df.append(table)
+                # merged_table_df = pd.concat(merged_table_df)
+            else:
+                ##check column length for tables (merged_table_df and next table from list)
+                ##table having more columns will get appended from data   
+                # for col1,col2 in zip():
+                pass
+    merged_table_df = pd.concat(merged_table_df)
+    return merged_table_df
 
     
 

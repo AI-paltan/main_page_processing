@@ -775,7 +775,7 @@ def get_super_col_row_df(df,index_dict,main_page_year_lst):
     if len(col_lst_unique) > 1:
         mod_df,column_numbr,row_number,raw_text,extracted_year = add_column_row_in_df(year_list=main_page_year_lst,col_list=col_lst_unique,df=df)
     elif len(col_lst_unique)==1:
-        mod_df,column_numbr,row_number,raw_text,extracted_year = add_year_value_in_particular_row_df(df=df,index_dict=dict,col_lst_unique=col_lst_unique)
+        mod_df,column_numbr,row_number,raw_text,extracted_year = add_year_value_in_particular_row_df(df=df,index_dict=index_dict,col_lst_unique=col_lst_unique[0])
     return mod_df,column_numbr,row_number,raw_text,extracted_year
 
 
@@ -811,18 +811,20 @@ def add_year_value_in_particular_row_df(df,index_dict,col_lst_unique):
     extracted_year = []
     column_numbr = []
     row_number = []
-    for year in index_dict.keys():
-        row_indices = index_dict[year]["row_indices"]
-        # col_indices = list(set(index_dict[year]["col_indices"]))
-        for row_idx in row_indices:
-            if row_idx not in processed_rows:
-                if (col_lst_unique -1) >=0:
-                    df.at[row_idx,col_lst_unique-1] = str(year) + str(df.iloc[row_idx,col_lst_unique-1])
-                    processed_rows.append(row_idx)
-                    raw_text.append([str(year) + str(df.iloc[row_idx,col_lst_unique-1])])
-                    extracted_year.append([int(year)])
-                    column_numbr.append(col_lst_unique-1)
-                    row_number.append([row_idx])
+    if len(index_dict)>0:
+        for year in index_dict.keys():
+            row_indices = index_dict[year]["row_indices"]
+            # col_indices = list(set(index_dict[year]["col_indices"]))
+            for row_idx in row_indices:
+                if row_idx not in processed_rows:
+                    if (col_lst_unique -1) >=0:
+                        # df.at[row_idx,col_lst_unique-1] = str(year) + str(df.iloc[row_idx,col_lst_unique-1])
+                        df.at[row_idx,0] = str(year) + str(df.iloc[row_idx,0])
+                        processed_rows.append(row_idx)
+                        raw_text.append([str(year) + str(df.iloc[row_idx,0])])
+                        extracted_year.append([int(year)])
+                        column_numbr.append(0)
+                        row_number.append([row_idx])
     return df,column_numbr,row_number,raw_text,extracted_year
 
 
