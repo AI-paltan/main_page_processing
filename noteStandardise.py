@@ -37,69 +37,69 @@ class NoteStandardised:
                 final_transformed_df = pd.DataFrame()
                 print(f"key :{key}")
                 # print(f"year list : {self.years_list}")
-                try:
-                    note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
-                    columns_number,row_number,raw_text,extracted_year = find_date_location(note_df,self.years_list)
-                    print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
-                    mod_df,column_numbr_s,row_number_s,raw_text_s,extracted_year_s = find_date_loc_super(df=note_df,main_page_notes_ref_dict=self.main_page_notes_ref_dict,key=key,prev_column_number=columns_number,prev_row_number=row_number,year_list=self.years_list)
-                    print(f"mod_df: {mod_df}")
-                    print(f"column_numbr_s = {column_numbr_s}, row_number_s = {row_number_s}, raw_text_s = {raw_text_s} , extracted_year_s = {extracted_year_s}")
-                    if len(raw_text_s) > 0:
-                        if raw_text_s[0][0] == -1:
-                            columns_number = columns_number
-                            row_number = row_number
-                            raw_text = raw_text
-                            extracted_year = extracted_year
-                            note_df = note_df
-                        else:
-                            columns_number = column_numbr_s
-                            row_number = row_number_s
-                            raw_text = raw_text_s
-                            extracted_year = extracted_year_s
-                            note_df  = mod_df
-                    print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
-                    data_row_coords,particular_end_col,particular_start_row = find_data_block_location(note_df=note_df.copy(),date_block_coordinates=(columns_number,row_number))
-                    print(f"data_row_coords: {data_row_coords} , particular_end_col: {particular_end_col} ,particular_start_row: {particular_start_row} ")
-                    header_indices = find_col_headers(note_df,data_row_coords,particular_end_col,particular_start_row)
-                    print(f"header indices : {header_indices}")
-                    nte_df,particular_end_col = check_and_remove_duplicate_particulars_column(note_df,particular_end_col,particular_start_row)
-                    databox_end_coordinates = (len(nte_df.columns)-1,len(nte_df)-1)
-                    row_header_indices = find_row_headers(nte_df,particular_end_col,particular_start_row)
-                    fill_missing_multilevel_header_df = fill_missing_multilevel_header(nte_df,header_indices,particular_end_col)
-                    blankrows,total_keywrd_added_df = set_totalKeyword_line_items(nte_df=fill_missing_multilevel_header_df,particulars_endcol_coordinates=particular_end_col,particulars_start_row=particular_start_row)
-                    row_header_to_columns_df = convert_row_header_to_columns(total_keywrd_added_df,row_header_indices,particular_start_row)
-                    # row_header_to_columns_df = convert_row_header_to_columns(fill_missing_multilevel_header_df,row_header_indices,particular_start_row)
-                    fin_df = convert_col_header_to_columns(row_header_to_columns_df,header_indices,particular_end_col,particular_start_row,databox_end_coordinates)
-                    # print(fin_df)
-                    # print(header_indices)
-                    # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
-                    # try:
-                    final_df,year_column_header_name = set_year_column_for_final_df2(fin_df,(columns_number,row_number),header_indices,raw_text,extracted_year)
+                # try:
+                note_df = note_df.dropna(axis = 1, how = 'all').T.reset_index(drop=True).T
+                columns_number,row_number,raw_text,extracted_year = find_date_location(note_df,self.years_list)
+                print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
+                mod_df,column_numbr_s,row_number_s,raw_text_s,extracted_year_s = find_date_loc_super(df=note_df,main_page_notes_ref_dict=self.main_page_notes_ref_dict,key=key,prev_column_number=columns_number,prev_row_number=row_number,year_list=self.years_list)
+                print(f"mod_df: {mod_df}")
+                print(f"column_numbr_s = {column_numbr_s}, row_number_s = {row_number_s}, raw_text_s = {raw_text_s} , extracted_year_s = {extracted_year_s}")
+                if len(raw_text_s) > 0:
+                    if raw_text_s[0][0] == -1:
+                        columns_number = columns_number
+                        row_number = row_number
+                        raw_text = raw_text
+                        extracted_year = extracted_year
+                        note_df = note_df
+                    else:
+                        columns_number = column_numbr_s
+                        row_number = row_number_s
+                        raw_text = raw_text_s
+                        extracted_year = extracted_year_s
+                        note_df  = mod_df
+                print(f" date cords : {columns_number} ,{row_number,raw_text,extracted_year}")
+                data_row_coords,particular_end_col,particular_start_row = find_data_block_location(note_df=note_df.copy(),date_block_coordinates=(columns_number,row_number))
+                print(f"data_row_coords: {data_row_coords} , particular_end_col: {particular_end_col} ,particular_start_row: {particular_start_row} ")
+                header_indices = find_col_headers(note_df,data_row_coords,particular_end_col,particular_start_row)
+                print(f"header indices : {header_indices}")
+                nte_df,particular_end_col = check_and_remove_duplicate_particulars_column(note_df,particular_end_col,particular_start_row)
+                databox_end_coordinates = (len(nte_df.columns)-1,len(nte_df)-1)
+                row_header_indices = find_row_headers(nte_df,particular_end_col,particular_start_row)
+                fill_missing_multilevel_header_df = fill_missing_multilevel_header(nte_df,header_indices,particular_end_col)
+                blankrows,total_keywrd_added_df = set_totalKeyword_line_items(nte_df=fill_missing_multilevel_header_df,particulars_endcol_coordinates=particular_end_col,particulars_start_row=particular_start_row)
+                row_header_to_columns_df = convert_row_header_to_columns(total_keywrd_added_df,row_header_indices,particular_start_row)
+                # row_header_to_columns_df = convert_row_header_to_columns(fill_missing_multilevel_header_df,row_header_indices,particular_start_row)
+                fin_df = convert_col_header_to_columns(row_header_to_columns_df,header_indices,particular_end_col,particular_start_row,databox_end_coordinates)
+                # print(fin_df)
+                # print(header_indices)
+                # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
+                # try:
+                final_df,year_column_header_name = set_year_column_for_final_df2(fin_df,(columns_number,row_number),header_indices,raw_text,extracted_year)
+            
+                # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
+                # print(final_df)
+                final_df = numbers_processing(final_df)
+                final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
+                meta_dict["date_column_number"] = columns_number
+                meta_dict["date_row_number"] = row_number
+                meta_dict["date_raw_text"] = raw_text
+                meta_dict["date_extracted_year"] = extracted_year
+                meta_dict["data_first_column"] = data_row_coords[0]
+                meta_dict["data_first_row"] = data_row_coords[1]
+                meta_dict["data_particular_end_col"] = particular_end_col
+                meta_dict["data_particular_start_row"] = particular_start_row
+                meta_dict["header_indices"] = header_indices
+                meta_dict["row_header_indices"] = row_header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["header_indices"] = header_indices
+                meta_dict["year_column_header_name"] = year_column_header_name
                 
-                    # final_df,year_column_header_name = set_year_column_for_final_df(fin_df,(columns_number,row_number),header_indices)
-                    # print(final_df)
-                    final_df = numbers_processing(final_df)
-                    final_transformed_df = convert_standaradised_notes_to_column_row_year(note_df=final_df,year_column_header_name_in=year_column_header_name)
-                    meta_dict["date_column_number"] = columns_number
-                    meta_dict["date_row_number"] = row_number
-                    meta_dict["date_raw_text"] = raw_text
-                    meta_dict["date_extracted_year"] = extracted_year
-                    meta_dict["data_first_column"] = data_row_coords[0]
-                    meta_dict["data_first_row"] = data_row_coords[1]
-                    meta_dict["data_particular_end_col"] = particular_end_col
-                    meta_dict["data_particular_start_row"] = particular_start_row
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["row_header_indices"] = row_header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["header_indices"] = header_indices
-                    meta_dict["year_column_header_name"] = year_column_header_name
-                    
-                except Exception as e:
-                    print(e)
+                # except Exception as e:
+                #     print(e)
                 self.standard_note_df[key] = final_df
                 self.standard_note_meta_dict[key] = meta_dict
                 self.transformed_standardised_cropped_dict[key] = final_transformed_df
