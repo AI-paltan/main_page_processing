@@ -97,7 +97,7 @@ class NoteStandardised:
                 meta_dict["header_indices"] = header_indices
                 meta_dict["header_indices"] = header_indices
                 meta_dict["year_column_header_name"] = year_column_header_name
-                
+                    
                 # except Exception as e:
                 #     print(e)
                 self.standard_note_df[key] = final_df
