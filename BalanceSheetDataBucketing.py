@@ -99,34 +99,40 @@ class BalanceSheetDataBucketing():
         main_page_raw_note_list = []
         main_page_particular_text_list = []
         main_page_value_list = []
+        matched_main_page_df = []
+        notes_table_df = []
+        temp_horizontal_df = []
         ## clear total keyowrds line items from main pages
-        df_datasheet = remove_total_lines_main_pages(df_datasheet=df_datasheet,filepath=keyword_mapping_settings.mastersheet_filter_particulars,statement_type='cbs',obj_techfuzzy=self.obj_techfuzzy)
-        for year in self.years_list:
-            # print(year)
-            main_page_best_match= get_main_page_line_items(df_datasheet=df_datasheet,keywords=main_page_targat_keywords,curr_year=year,obj_techfuzzy=self.obj_techfuzzy,conf_score_thresh=self.conf_score_thresh,match_type=match_type)
+        try:
+            df_datasheet = remove_total_lines_main_pages(df_datasheet=df_datasheet,filepath=keyword_mapping_settings.mastersheet_filter_particulars,statement_type='cbs',obj_techfuzzy=self.obj_techfuzzy)
+            for year in self.years_list:
+                # print(year)
+                main_page_best_match= get_main_page_line_items(df_datasheet=df_datasheet,keywords=main_page_targat_keywords,curr_year=year,obj_techfuzzy=self.obj_techfuzzy,conf_score_thresh=self.conf_score_thresh,match_type=match_type)
+                # print(f"main_page_best_match:= {main_page_best_match}")
+                # main_page_data_indices.append(main_page_best_match.get("data_index"))
+                main_page_data_indices = main_page_best_match.get("data_index")
+                main_page_year_total_lst.append(main_page_best_match.get("value"))
+                main_page_particular_text_list = main_page_best_match.get("line_item_label")
+                main_page_value_list.append(main_page_best_match.get("line_item_value"))
+                # print(list(main_page_best_match.get("label")))
             # print(f"main_page_best_match:= {main_page_best_match}")
-            # main_page_data_indices.append(main_page_best_match.get("data_index"))
-            main_page_data_indices = main_page_best_match.get("data_index")
-            main_page_year_total_lst.append(main_page_best_match.get("value"))
-            main_page_particular_text_list = main_page_best_match.get("line_item_label")
-            main_page_value_list.append(main_page_best_match.get("line_item_value"))
-            # print(list(main_page_best_match.get("label")))
-        # print(f"main_page_best_match:= {main_page_best_match}")
-        filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list = get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match=main_page_best_match,notes_reference_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,trasnformed_standardised_cropped_dict=self.transformed_standardised_cropped_dict,statement_type="cbs")
-        # print(f"1.raw_note_list: {raw_note_list},note_number_list: {note_number_list},sbnoue: {subnote_number_list},tableid:{tableid_list}")
-        # print(f"len of std dict {len(filtered_standardised_tables_dict)} and len of trasnformed std dict: {len(filtered_transformed_standardised_tables_dict)}")
-        noted_dict_respnse_after_filtering_keywrods = get_notes_dfDict_after_filtering_keywords(note_number_list=note_number_list,subnote_number_list=subnote_number_list,tableid_list=tableid_list,filtered_transformed_standardised_tables_dict=filtered_transformed_standardised_tables_dict,obj_techfuzzy=self.obj_techfuzzy,conf_score=self.conf_score_thresh,match_type='partial',notes_include_keywords=note_page_include_keywords,notes_exclude_keywords=notes_page_exclude_keywords)
-        # temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
-        # print("new meta dict")
-        # print(noted_dict_respnse_after_filtering_keywrods)
-        temp_df,temp_horizontal_df = prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,tableid_list,noted_dict_respnse_after_filtering_keywrods)
-        notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
-        main_page_raw_note_list = raw_note_list
-        # print(main_page_data_indices)
-        matched_main_page_df = get_matched_main_page_df(main_page_data_indices=main_page_data_indices,df=self.df_datasheet)
-        ## psoprocess horizontal standardised notes df
-        temp_horizontal_df = postprocessing_note_df(std_hrzntl_nte_df=temp_horizontal_df)
+            filtered_standardised_tables_dict,filtered_transformed_standardised_tables_dict,raw_note_list,note_number_list,subnote_number_list,tableid_list = get_notes_tables_from_meta_dict_and_standardized_notes_dict(main_page_best_match=main_page_best_match,notes_reference_dict=self.notes_ref_dict,notes_region_meta_data=self.notes_region_meta_data,standardised_cropped_dict=self.standardised_cropped_dict,trasnformed_standardised_cropped_dict=self.transformed_standardised_cropped_dict,statement_type="cbs")
+            # print(f"1.raw_note_list: {raw_note_list},note_number_list: {note_number_list},sbnoue: {subnote_number_list},tableid:{tableid_list}")
+            # print(f"len of std dict {len(filtered_standardised_tables_dict)} and len of trasnformed std dict: {len(filtered_transformed_standardised_tables_dict)}")
+            noted_dict_respnse_after_filtering_keywrods = get_notes_dfDict_after_filtering_keywords(note_number_list=note_number_list,subnote_number_list=subnote_number_list,tableid_list=tableid_list,filtered_transformed_standardised_tables_dict=filtered_transformed_standardised_tables_dict,obj_techfuzzy=self.obj_techfuzzy,conf_score=self.conf_score_thresh,match_type='partial',notes_include_keywords=note_page_include_keywords,notes_exclude_keywords=notes_page_exclude_keywords)
+            # temp_df = prepare_df_for_dumping(raw_note_list,note_number_list,subnote_number_list,tableid_list,filtered_transformed_standardised_tables_dict)
+            # print("new meta dict")
+            # print(noted_dict_respnse_after_filtering_keywrods)
+            temp_df,temp_horizontal_df = prepare_df_for_dumping2(raw_note_list,note_number_list,subnote_number_list,tableid_list,noted_dict_respnse_after_filtering_keywrods)
+            notes_table_df = pd.concat([notes_table_df,temp_df],ignore_index=True)
+            main_page_raw_note_list = raw_note_list
+            # print(main_page_data_indices)
+            matched_main_page_df = get_matched_main_page_df(main_page_data_indices=main_page_data_indices,df=self.df_datasheet)
+            ## psoprocess horizontal standardised notes df
+            temp_horizontal_df = postprocessing_note_df(std_hrzntl_nte_df=temp_horizontal_df)
             # get_notes_pages_line_items()
+        except:
+            pass
         temp_dict ={}
         temp_dict["main_page_row_indices"] = main_page_data_indices
         temp_dict["main_page_year_total"] =main_page_year_total_lst

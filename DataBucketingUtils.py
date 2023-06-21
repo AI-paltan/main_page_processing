@@ -47,6 +47,7 @@ def strip_string_bullets(str_txt,obj_techfuzzy):
 
 def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,conf_score_thresh,match_type='partial'):
     best_match = {'data_index': [], 'score': 0, 'value': 0, 'line_item_label': [],'note_numbers':[],'line_item_value':[]}
+    datasheet_col_list = df_datasheet.columns.to_list()
     for data_index, data_row in df_datasheet.iterrows():
             # skip if data value is already found for bucketing
             # app.logger.debug(data_row["Particulars"])
@@ -67,7 +68,8 @@ def get_main_page_line_items(df_datasheet,keywords,curr_year,obj_techfuzzy,conf_
                 best_match['score'] = res_fuzz_match[0][1]
                 (best_match['data_index']).append(data_index)
                 # if len(data_row['Notes']) > 1:
-                (best_match['note_numbers']).append(data_row['Notes'])
+                if 'Notes' in datasheet_col_list:
+                    (best_match['note_numbers']).append(data_row['Notes'])
                 # self.cbs_drilldown_items(bucket_row, data_row)
                 (best_match['line_item_label']).append(data_row[str("Particulars")])
                 (best_match['line_item_value']).append(float(data_row[curr_year]))
