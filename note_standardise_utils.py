@@ -590,10 +590,10 @@ def set_year_column_for_final_df2(fin_df,date_coordinates,header_indices,raw_yea
             year_column_header_name = f"header_col_{col_subscript}"
         else:
             row_header_flag = False
-            # print(f"fin_df.columns = {fin_df.columns}")
-            # print(f"find_df = {fin_df}")
-            # print(f"raw_year = {raw_year}")
-            # print(f"extracted_year={extracted_year}")
+            print(f"fin_df.columns = {fin_df.columns}")
+            print(f"find_df = {fin_df}")
+            print(f"raw_year = {raw_year}")
+            print(f"extracted_year={extracted_year}")
             if 'row_header' in fin_df.columns.to_list():
                 cnt = 0
                 for idx,row in fin_df.iterrows():
@@ -608,12 +608,12 @@ def set_year_column_for_final_df2(fin_df,date_coordinates,header_indices,raw_yea
                 cnt = 0
                 for col_header , line_row in fin_df.filter(like="line_item", axis=1).iteritems():
                     for idx,line_item in enumerate(line_row):
-                        # for raw_year_text,year in zip(raw_year[0],extracted_year[0]):
-                        for raw_year_text,year in zip(raw_year,extracted_year):
+                        for raw_year_text,year in zip(raw_year[0],extracted_year[0]):
+                        # for raw_year_text,year in zip(raw_year,extracted_year):
                             if str(line_item).lower().strip() == str(raw_year_text).lower().strip():
-                                # print(f"str(line_item).lower().strip()={str(line_item).lower().strip()}")
-                                # print(f"tr(raw_year_text).lower().strip() = {str(raw_year_text).lower().strip()}")
-                                # print(f"year = {year}")
+                                print(f"str(line_item).lower().strip()={str(line_item).lower().strip()}")
+                                print(f"str(raw_year_text).lower().strip() = {str(raw_year_text).lower().strip()}")
+                                print(f"year = {year}")
                                 fin_df.at[idx,'year'] = year   ## old code before 21 june
                                 # fin_df.at[idx,'year'] = year[0]  # need to test it with 20maa
         # print(f"fin_df_year_add = {fin_df}")
@@ -825,7 +825,7 @@ def add_column_row_in_df(year_list,col_list,df):
     row_add = np.array(row_add_lst)
     row_add[:] = np.nan
     # row_add = [] 
-    print(row_add)
+    # print(row_add)
     raw_text = []
     extracted_year = []
     column_numbr = []
@@ -850,6 +850,8 @@ def add_year_value_in_particular_row_df(df,index_dict,col_lst_unique):
     extracted_year = []
     column_numbr = []
     row_number = []
+    temp_raw_text = []
+    temp_extracted_year = []
     # print(f"col_lst_unique={col_lst_unique}")
     if len(index_dict)>0:
         for year in index_dict.keys():
@@ -861,11 +863,18 @@ def add_year_value_in_particular_row_df(df,index_dict,col_lst_unique):
                         # df.at[row_idx,col_lst_unique-1] = str(year) + str(df.iloc[row_idx,col_lst_unique-1])
                         df.at[row_idx,0] = str(year) +' '+ str(df.iloc[row_idx,0])
                         processed_rows.append(row_idx)
-                        raw_text.append(df.at[row_idx,0] )
-                        extracted_year.append(int(year))
+                        # raw_text.append(df.at[row_idx,0] )
+                        # extracted_year.append(int(year))
+                        # print(f"temp_raw_text= {temp_raw_text}")
+                        temp_raw_text.append(df.at[row_idx,0])
+                        temp_extracted_year.append(int(year))
                         column_numbr.append(0)
                         row_number.append(row_idx)
                         # print(f"raw_text={raw_text}")
+   
+    raw_text.append(temp_raw_text)
+    extracted_year.append(temp_extracted_year)
+    # print(f"raw_text={raw_text}")
     column_numbr = list(set(column_numbr))
     return df,column_numbr,row_number,raw_text,extracted_year
 
